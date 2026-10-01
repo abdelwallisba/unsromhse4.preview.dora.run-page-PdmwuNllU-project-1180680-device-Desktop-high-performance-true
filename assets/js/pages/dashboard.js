@@ -143,7 +143,7 @@
     });
     qsa("[data-price]", host).forEach((inp) => inp.addEventListener("change", () => { shop.products[+inp.dataset.price].price = Math.max(0, +inp.value); save(); toast("Prix mis à jour."); }));
     qsa("[data-stock]", host).forEach((inp) => inp.addEventListener("change", () => { shop.products[+inp.dataset.stock].stock = Math.max(0, +inp.value); save(); productsPanel(); }));
-    qsa("[data-del]", host).forEach((b) => b.addEventListener("click", () => { if (confirm("Supprimer ce produit ?")) { shop.products.splice(+b.dataset.del, 1); save(); productsPanel(); } }));
+    qsa("[data-del]", host).forEach((b) => b.addEventListener("click", async () => { if (await LB.ask("Supprimer ce produit ?", "Supprimer")) { shop.products.splice(+b.dataset.del, 1); save(); productsPanel(); } }));
   }
 
   function statsPanel() {

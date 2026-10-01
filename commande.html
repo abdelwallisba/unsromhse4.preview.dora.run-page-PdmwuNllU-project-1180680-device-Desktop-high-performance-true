@@ -82,7 +82,7 @@
           (o.discount ? '<div class="summary-row"><span>Remises</span><span>−' + fmt(o.discount) + "</span></div>" : "") +
           '<div class="summary-row total"><span>Total</span><span>' + fmt(o.total) + "</span></div>" +
           '<p class="muted" style="margin:8px 0 0">Paiement : ' + PAY[o.payment.method] + " · " + (o.payment.status === "payee" ? "✅ Payé" : o.payment.status === "rembourse" ? "↩️ Remboursé" : "💵 À régler à la livraison") + "</p>" +
-          '<button class="btn btn--ghost btn--sm" style="margin-top:12px" onclick="window.print()">🖨️ Imprimer la facture</button></div>' +
+          "</div>" +
           "</div><div>" +
 
           (status !== "annulee" && status !== "livree" ? '<div class="card card-body" style="text-align:center;margin-bottom:16px"><h3>Votre QR code de réception</h3><div id="qr" style="display:grid;place-items:center;min-height:180px"></div><p class="muted" style="font-size:.88rem;margin:10px 0 0">À présenter au livreur <strong>après</strong> avoir vérifié votre panier. Ne le partagez pas : il prouve que c\'est bien vous.</p><p style="font-family:monospace;font-size:.85rem;margin:6px 0 0">' + esc(o.qr) + '</p><button class="btn btn--primary btn--sm" style="margin-top:12px" id="simulate-scan">Simuler le scan du livreur</button></div>' : "") +

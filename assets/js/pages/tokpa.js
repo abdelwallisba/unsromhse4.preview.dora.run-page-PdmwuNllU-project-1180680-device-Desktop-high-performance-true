@@ -157,10 +157,10 @@
       '<button class="btn btn--orange btn--block" id="b-send"' + (lines.length ? "" : " disabled") + ">Envoyer la commande</button></div></div>";
 
     const send = qs("#b-send");
-    if (send) send.addEventListener("click", () => {
+    if (send) send.addEventListener("click", async () => {
       const sub = currentSub();
       if (!sub) return;
-      if (left === 0 && !confirm("Votre quota mensuel est épuisé. Cette livraison sera facturée " + fmt(C.tokpa.extraDeliveryFee) + ". Continuer ?")) return;
+      if (left === 0 && !(await LB.ask("Votre quota mensuel est épuisé. Cette livraison sera facturée " + fmt(C.tokpa.extraDeliveryFee) + ". Continuer ?", "Commander"))) return;
       const order = { id: uid("TX-"), createdAt: new Date().toISOString(), lines: lines.map((l) => ({ id: l.p.id, name: l.p.name, qty: l.q, price: l.p.price })), total: total + extra, date: qs("#b-date").value, slot: qs("#b-slot").value, auto: qs("#b-auto").checked, pay: qs("#b-pay").value, pin: String(Math.floor(1000 + Math.random() * 9000)), status: "Confirmée" };
       store.set("tokpaOrders", [order].concat(store.get("tokpaOrders", [])));
       const { u, t } = sub;
@@ -260,8 +260,8 @@
     const save = qs("#abo-save");
     if (!save) return;
     save.addEventListener("click", () => { const s = currentSub(); s.t.planId = qs("#abo-plan").value; auth.save(s.u); toast("Formule mise à jour."); renderPro(); });
-    qs("#abo-stop").addEventListener("click", () => {
-      if (!confirm("Résilier votre abonnement TokpaExpress ?")) return;
+    qs("#abo-stop").addEventListener("click", async () => {
+      if (!(await LB.ask("Résilier votre abonnement TokpaExpress ?", "Résilier"))) return;
       const s = currentSub(); s.u.tokpa = null; s.u.role = "client"; auth.save(s.u); toast("Abonnement résilié."); renderPro();
     });
     const as = qs("#auto-stop");

@@ -46,7 +46,7 @@
         </form>
         <div>
           <ul class="contact-list card card-body" id="coords"></ul>
-          <div style="margin-top:16px"><iframe class="map" id="map" title="Carte : LocalBox à Cotonou" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+          <a class="card card-body" id="map" target="_blank" rel="noopener" style="display:flex;gap:12px;align-items:center;margin-top:16px;text-decoration:none;color:inherit"><span style="font-size:2rem">🗺️</span><span><strong>Voir sur Google Maps</strong><br><span class="muted">Dantokpa, Cotonou</span></span></a>
         </div>
       </div>
     </section>
@@ -66,7 +66,7 @@
         '<li><span class="ico">✉️</span><div><strong>E-mail</strong><br><a href="mailto:' + esc(c.email) + '">' + esc(c.email) + "</a></div></li>" +
         '<li><span class="ico">📍</span><div><strong>Adresse</strong><br>' + esc(c.address) + "</div></li>" +
         '<li><span class="ico">🕒</span><div><strong>Horaires du service client</strong><br>' + esc(c.hours) + "</div></li>";
-      qs("#map").src = "https://www.google.com/maps?q=" + encodeURIComponent(c.mapQuery) + "&output=embed";
+      qs("#map").href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(c.mapQuery);
       if (param("sujet")) qs("#c-subject").value = param("sujet");
 
       qs("#contact-form").addEventListener("submit", (e) => {

@@ -136,9 +136,9 @@
         tabHtml('<div class="grid grid-2"><div class="card card-body"><h3>Solde : ' + (u.points || 0) + ' LocalPoints</h3><p class="muted">10 points par tranche de 1 000 FCFA · ' + C.points.review + " points par avis · " + C.points.referral + " points par parrainage · " + C.points.fifthOrderBonus + " points toutes les 5 commandes.</p>" +
           '<h3 style="margin-top:12px">Échanger mes points</h3>' + C.points.rewards.map((r, i) => '<div class="summary-row" style="border-bottom:1px solid var(--line);padding:10px 0"><span>' + esc(r.label) + ' <span class="muted">· ' + r.pts + ' pts</span></span><button class="btn btn--sm ' + (u.points >= r.pts ? "btn--orange" : "btn--ghost") + '" data-reward="' + i + '"' + (u.points >= r.pts ? "" : " disabled") + ">Échanger</button></div>").join("") +
           '</div><div class="card card-body"><h3>Historique</h3>' + ((u.pointsLog || []).slice().reverse().map((l) => '<div class="summary-row"><span>' + esc(l.reason) + ' <span class="muted" style="font-size:.8rem">' + new Date(l.date).toLocaleDateString("fr-FR") + '</span></span><strong style="color:' + (l.n >= 0 ? "var(--success)" : "var(--danger)") + '">' + (l.n >= 0 ? "+" : "") + l.n + "</strong></div>").join("") || '<p class="muted">50 points de bienvenue crédités.</p>') + "</div></div>");
-        qsa("[data-reward]").forEach((b) => b.addEventListener("click", () => {
+        qsa("[data-reward]").forEach((b) => b.addEventListener("click", async () => {
           const r = C.points.rewards[+b.dataset.reward];
-          if (!confirm("Échanger " + r.pts + " points contre : " + r.label + " ?")) return;
+          if (!(await LB.ask("Échanger " + r.pts + " points contre : " + r.label + " ?", "Échanger"))) return;
           auth.addPoints(-r.pts, "Récompense : " + r.label);
           const code = "RW-" + Math.random().toString(36).slice(2, 8).toUpperCase();
           store.set("rewards", store.get("rewards", []).concat([{ label: r.label, code, date: new Date().toISOString() }]));
@@ -162,8 +162,8 @@
         tabHtml('<form class="card card-body form" id="profile" style="max-width:560px"><div class="field"><label for="p-name">Nom</label><input class="input" id="p-name" value="' + esc(u.name) + '"></div><div class="field"><label for="p-phone">Téléphone</label><input class="input" id="p-phone" value="' + esc(u.phone) + '"></div><div class="field"><label for="p-email">E-mail</label><input class="input" id="p-email" type="email" value="' + esc(u.email || "") + '"></div><label class="check"><input type="checkbox" id="p-news"' + (u.news !== false ? " checked" : "") + '> Recevoir le #CarnetDuMarché et les offres (WhatsApp / e-mail)</label><div class="hero-ctas"><button class="btn btn--primary" type="submit">Enregistrer</button><button class="btn btn--ghost" type="button" id="logout">Se déconnecter</button></div><hr style="border:0;border-top:1px solid var(--line);width:100%"><button class="link-btn" type="button" id="wipe">Supprimer mon compte et mes données de cet appareil</button></form>');
         qs("#profile").addEventListener("submit", (e) => { e.preventDefault(); Object.assign(u, { name: qs("#p-name").value.trim() || u.name, phone: qs("#p-phone").value.trim() || u.phone, email: qs("#p-email").value.trim(), news: qs("#p-news").checked }); auth.save(u); toast("Profil mis à jour."); });
         qs("#logout").addEventListener("click", () => { auth.logout(); renderAuth(); toast("Vous êtes déconnecté."); });
-        qs("#wipe").addEventListener("click", () => {
-          if (!confirm("Supprimer définitivement votre compte, vos commandes et vos données de cet appareil ?")) return;
+        qs("#wipe").addEventListener("click", async () => {
+          if (!(await LB.ask("Supprimer définitivement votre compte, vos commandes et vos données de cet appareil ?", "Supprimer"))) return;
           ["user", "orders", "tickets", "rewards", "cart", "tokpaOrders", "tokpaCart", "shopReviews"].forEach((k) => store.remove(k));
           renderAuth(); toast("Données supprimées.");
         });

@@ -67,6 +67,23 @@
     t._timer = setTimeout(() => t.classList.remove("is-visible"), 2600);
   }
 
+  /* Confirmation dans la page (remplace window.confirm) */
+  function ask(message, okLabel) {
+    return new Promise((resolve) => {
+      const m = document.createElement("div");
+      m.className = "modal is-open";
+      m.setAttribute("role", "dialog");
+      m.setAttribute("aria-modal", "true");
+      m.innerHTML = '<div class="modal-box"><p style="font-size:1.05rem;margin-top:0">' + esc(message) + '</p><div class="hero-ctas"><button class="btn btn--primary" data-ok>' + esc(okLabel || "Confirmer") + '</button><button class="btn btn--ghost" data-no>Annuler</button></div></div>';
+      const done = (v) => { m.remove(); resolve(v); };
+      m.querySelector("[data-ok]").addEventListener("click", () => done(true));
+      m.querySelector("[data-no]").addEventListener("click", () => done(false));
+      m.addEventListener("click", (e) => { if (e.target === m) done(false); });
+      document.body.appendChild(m);
+      m.querySelector("[data-ok]").focus();
+    });
+  }
+
   /* Heure locale du Bénin (UTC+1) pour l'état « Ouvert / Fermé » */
   function beninNow() {
     const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Porto-Novo", weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(new Date());
@@ -434,7 +451,7 @@
     applyI18n();
   }
 
-  window.LB = { C, D, store, fmt, esc, qs, qsa, param, uid, waLink, stars, toast, isOpen, openBadge, findItem, cart, auth, orders, STATUS, t, applyI18n, ICON, productCard, shopProductCard, merchantCard, thumb };
+  window.LB = { C, D, store, fmt, esc, ask, qs, qsa, param, uid, waLink, stars, toast, isOpen, openBadge, findItem, cart, auth, orders, STATUS, t, applyI18n, ICON, productCard, shopProductCard, merchantCard, thumb };
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
