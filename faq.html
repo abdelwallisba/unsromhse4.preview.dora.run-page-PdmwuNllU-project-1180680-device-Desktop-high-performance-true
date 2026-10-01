@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Foire aux questions | LocalBox</title>
+  <meta name="description" content="Toutes les réponses sur LocalBox : commandes, paiement Mobile Money, livraison, QR code, retours, TokpaExpress, Marketplace et LocalPoints.">
+  <meta name="theme-color" content="#cc6e28">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="faq">
+  <div id="site-header"></div>
+  <main id="main">
+    <section class="section">
+      <div class="container" style="max-width:860px">
+        <h1>Foire aux questions</h1>
+        <label class="search-input" style="background:#fff;margin:16px 0"><span aria-hidden="true">🔎</span><span class="sr-only">Rechercher une question</span><input type="search" id="q" placeholder="Rechercher une question…"></label>
+        <div class="faq-cats" id="cats"></div>
+        <div class="faq" id="faq"></div>
+        <div class="card card-body" style="margin-top:28px;text-align:center">
+          <h3>Vous n'avez pas trouvé votre réponse ?</h3>
+          <p class="muted">Notre équipe vous répond 7j/7 sur WhatsApp et par téléphone aux heures d'ouverture.</p>
+          <div class="hero-ctas" style="justify-content:center"><a class="btn btn--whatsapp" id="wa" target="_blank" rel="noopener">WhatsApp</a><a class="btn btn--primary" href="contact.html">Nous contacter</a></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const { D, qs, esc, waLink } = LB;
+      qs("#wa").href = waLink(null, "Bonjour LocalBox, j'ai une question.");
+      const cats = ["Toutes"].concat(Array.from(new Set(D.faq.map((f) => f.cat))));
+      let cat = "Toutes", q = "";
+      function render() {
+        qs("#cats").innerHTML = cats.map((c) => '<button class="chip' + (c === cat ? " is-active" : "") + '" data-c="' + esc(c) + '">' + esc(c) + "</button>").join("");
+        const list = D.faq.filter((f) => (cat === "Toutes" || f.cat === cat) && (!q || (f.q + f.a).toLowerCase().includes(q)));
+        qs("#faq").innerHTML = list.length ? list.map((f) => "<details><summary>" + esc(f.q) + "</summary><div>" + esc(f.a) + "</div></details>").join("") : '<div class="empty">Aucune question ne correspond.</div>';
+      }
+      qs("#cats").addEventListener("click", (e) => { const b = e.target.closest("[data-c]"); if (b) { cat = b.dataset.c; render(); } });
+      qs("#q").addEventListener("input", (e) => { q = e.target.value.toLowerCase(); render(); });
+      render();
+      // Données structurées FAQ pour les moteurs de recherche
+      const ld = document.createElement("script");
+      ld.type = "application/ld+json";
+      ld.textContent = JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: D.faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) });
+      document.head.appendChild(ld);
+    })();
+  </script>
+</body>
+</html>

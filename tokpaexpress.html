@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TokpaExpress — Approvisionnement en gros livré à votre boutique | LocalBox</title>
+  <meta name="description" content="TokpaExpress : abonnement pour commerçants dès 5 000 FCFA/mois. Commandez vos cartons au prix de gros du marché Tokpa et recevez-les à votre boutique.">
+  <meta name="theme-color" content="#cc6e28">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="tokpa">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <section class="hero">
+      <div class="container">
+        <div>
+          <p class="eyebrow" style="color:#ffe1c2">TokpaExpress · Vente en gros B2B</p>
+          <h1>Commandez en 5 minutes, recevez sans effort</h1>
+          <p>Vos cartons et sacs au prix de gros du marché Tokpa, livrés directement à votre boutique. Plus besoin de fermer pour aller au marché.</p>
+          <div class="hero-ctas">
+            <a class="btn btn--brick" href="#abonnements">Voir les abonnements</a>
+            <a class="btn btn--light" href="#espace-pro">Mon espace pro</a>
+          </div>
+        </div>
+        <div class="hero-art"><img src="assets/img/hero-vendeuse.jpg" alt="" width="555" height="405"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head"><div><p class="eyebrow">Pourquoi TokpaExpress ?</p><h2>Une révolution logistique pour les détaillants</h2></div></div>
+        <div class="grid grid-4">
+          <div class="card card-body"><h3>⏱️ Gagnez du temps</h3><p class="muted">Restez dans votre boutique et servez vos clients au lieu de passer la matinée au marché.</p></div>
+          <div class="card card-body"><h3>💰 Prix de gros</h3><p class="muted">Les mêmes prix qu'au marché Tokpa, sans marge cachée. Vous ne payez que l'abonnement logistique.</p></div>
+          <div class="card card-body"><h3>🔒 Moins de risques</h3><p class="muted">Moins d'espèces transportées, plus de charges lourdes à porter, des livraisons tracées.</p></div>
+          <div class="card card-body"><h3>📊 Statistiques offertes</h3><p class="muted">Bénéfice potentiel, marge, comparateur et alertes de réassort inclus gratuitement.</p></div>
+        </div>
+        <p class="muted center" style="margin-top:18px">Objectif visé pour un abonné : jusqu'à <strong>10 heures gagnées par semaine</strong> et <strong>20 000 FCFA de transport économisés par mois</strong>.</p>
+      </div>
+    </section>
+
+    <section class="section section--white" id="abonnements">
+      <div class="container">
+        <div class="section-head"><div><p class="eyebrow">Abonnements mensuels</p><h2>Un forfait fixe, des livraisons incluses</h2></div><p>Sans engagement · Prix de gros identiques au marché</p></div>
+        <div class="grid grid-2" id="plans" style="max-width:820px;margin:0 auto"></div>
+        <p class="muted center" style="margin-top:16px;font-size:.9rem">Au-delà du quota mensuel, une livraison supplémentaire est facturée <span id="extra-fee"></span>. Un rappel vous est envoyé en fin de mois s'il vous reste des livraisons.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head"><div><p class="eyebrow">Comment ça marche</p><h2>Votre réassort en 6 étapes</h2></div></div>
+        <ol class="steps-list steps-list--3">
+          <li><h3>Abonnez-vous</h3><p class="muted" style="margin:0">Choisissez le profil « Commerçant » et votre formule. Votre espace TokpaExpress s'active aussitôt.</p></li>
+          <li><h3>Commandez depuis l'espace pro</h3><p class="muted" style="margin:0">Catalogue de gros avec fiches détaillées : contenu, poids, conseils, rentabilité.</p></li>
+          <li><h3>Choisissez la livraison</h3><p class="muted" style="margin:0">Date et créneau, ou livraison automatique toutes les deux semaines. Votre quota restant est toujours visible.</p></li>
+          <li><h3>Traitement prioritaire</h3><p class="muted" style="margin:0">Nos agents TokpaExpress achètent en gros chez les fournisseurs partenaires et regroupent les commandes par zone.</p></li>
+          <li><h3>Livraison à la boutique</h3><p class="muted" style="margin:0">Colis conditionnés solidement, livraison géolocalisée et notifiée.</p></li>
+          <li><h3>Réception confirmée</h3><p class="muted" style="margin:0">Vous vérifiez, puis validez par QR code ou code PIN. Le quota se met à jour automatiquement.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section section--sand" id="inscription">
+      <div class="container contact-grid">
+        <form class="card card-body form" id="sub-form" novalidate>
+          <h2 style="font-size:1.4rem">S'abonner à TokpaExpress</h2>
+          <div class="form-row">
+            <div class="field"><label for="t-shop">Nom de la boutique *</label><input class="input" id="t-shop" required></div>
+            <div class="field"><label for="t-name">Nom du gérant *</label><input class="input" id="t-name" required autocomplete="name"></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="t-phone">Téléphone *</label><input class="input" id="t-phone" type="tel" required autocomplete="tel" placeholder="01 XX XX XX XX"></div>
+            <div class="field"><label for="t-type">Type de commerce</label><select class="select" id="t-type"><option>Boutique de quartier</option><option>Kiosque</option><option>Épicerie / supérette</option><option>Restaurant / maquis</option><option>Revendeur au marché</option><option>Autre</option></select></div>
+          </div>
+          <div class="field"><label for="t-address">Adresse de livraison de la boutique *</label><input class="input" id="t-address" required placeholder="Quartier, repères"></div>
+          <fieldset style="border:0;padding:0;margin:0"><legend><strong>Formule</strong></legend><div id="plan-radios"></div></fieldset>
+          <fieldset style="border:0;padding:0;margin:0"><legend><strong>Paiement de l'abonnement</strong></legend>
+            <div class="pay-options">
+              <label class="pay-option"><input type="radio" name="t-pay" value="mtn" checked><span class="pay-logo mtn">MoMo</span>MTN Mobile Money</label>
+              <label class="pay-option"><input type="radio" name="t-pay" value="moov"><span class="pay-logo moov">Moov</span>Moov Money</label>
+              <label class="pay-option"><input type="radio" name="t-pay" value="celtiis"><span class="pay-logo celtiis">Celtiis</span>Celtiis Cash</label>
+            </div>
+          </fieldset>
+          <div class="form-msg" id="t-msg" role="alert"></div>
+          <button class="btn btn--orange" type="submit">Activer mon abonnement</button>
+          <p class="muted" style="font-size:.85rem;margin:0">Démonstration : aucun prélèvement réel n'est effectué.</p>
+        </form>
+        <div>
+          <div class="card card-body" style="margin-bottom:16px">
+            <h3>📩 Pas de smartphone ? Inscrivez-vous par SMS</h3>
+            <p>Envoyez <strong>TOKPA</strong> suivi du nom de votre boutique au <strong id="sms-number"></strong>. Un agent vous rappelle pour finaliser votre inscription.</p>
+            <a class="btn btn--ghost btn--sm" id="sms-link" href="#">Envoyer le SMS</a>
+          </div>
+          <div class="card card-body" style="margin-bottom:16px">
+            <h3>🧑🏾‍💼 Nos agents TokpaExpress viennent à vous</h3>
+            <p class="muted">Nos animateurs terrain passent dans les marchés et zones commerçantes pour des démonstrations et vous remettent un pack de bienvenue (guide, autocollant « I ❤ LocalBox », offre d'essai).</p>
+          </div>
+          <div class="card card-body" style="border:2px solid var(--orange)">
+            <h3>💳 La carte TokpaPro</h3>
+            <p class="muted">Remise après <strong>un an d'abonnement continu</strong> :</p>
+            <ul class="spec-list" style="margin:0">
+              <li>Livraison prioritaire lors des tournées</li>
+              <li>Hotline dédiée en horaires étendus</li>
+              <li>Badge « TokpaPro » sur votre boutique Marketplace</li>
+              <li>Petits-déjeuners réseautage TokpaPro chaque trimestre</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Espace pro -->
+    <section class="section" id="espace-pro">
+      <div class="container" id="pro-root"></div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/pages/tokpa.js"></script>
+</body>
+</html>

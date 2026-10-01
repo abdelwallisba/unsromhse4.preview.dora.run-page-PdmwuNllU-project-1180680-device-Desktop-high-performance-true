@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /panier.html
+Disallow: /commande.html
+Disallow: /compte.html
+Disallow: /tableau-de-bord.html

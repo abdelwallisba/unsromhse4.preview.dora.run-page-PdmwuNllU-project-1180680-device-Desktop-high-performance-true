@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LocalBox — Le marché béninois livré chez vous</title>
+  <meta name="description" content="LocalBox : courses du marché livrées le jour même, approvisionnement en gros TokpaExpress et marketplace sans commission pour les commerçants béninois.">
+  <meta property="og:title" content="LocalBox — Le marché dans votre main">
+  <meta property="og:description" content="Produits locaux béninois, livrés chez vous. Magasin, TokpaExpress et Marketplace sur une seule plateforme.">
+  <meta property="og:image" content="assets/img/hero-vendeuse.jpg">
+  <meta name="theme-color" content="#cc6e28">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="accueil">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <!-- Bannière principale -->
+    <section class="hero">
+      <div class="container">
+        <div>
+          <h1 data-i18n="home.hero.title">Produits locaux béninois et destinés au marché béninois</h1>
+          <p data-i18n="home.hero.text">Votre boutique locale en ligne et flexible.</p>
+          <div class="hero-ctas">
+            <a class="btn btn--brick" href="magasin.html" data-i18n="home.hero.cta">Voir les produits</a>
+            <a class="btn btn--light" href="marketplace.html" data-i18n="home.hero.cta2">Explorer la Marketplace</a>
+          </div>
+        </div>
+        <div class="hero-art"><img src="assets/img/hero-vendeuse.jpg" alt="Une commerçante béninoise présente un panier de fruits et produits locaux" width="555" height="405"></div>
+      </div>
+    </section>
+
+    <!-- Atouts -->
+    <section class="features" aria-label="Nos atouts">
+      <div class="container">
+        <ul id="features"></ul>
+      </div>
+    </section>
+
+    <!-- Offres du moment -->
+    <section class="section--tight">
+      <div class="container">
+        <a class="ad-banner" id="promo-banner" href="vendre.html"></a>
+      </div>
+    </section>
+
+    <!-- Trois services -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Une plateforme, trois services</p>
+            <h2>Tout le commerce local au même endroit</h2>
+          </div>
+          <p>Particuliers, commerçants de quartier et vendeurs indépendants : chacun trouve sa place sur LocalBox.</p>
+        </div>
+        <div class="grid grid-3">
+          <article class="card plan">
+            <span class="pill">B2C · Particuliers</span>
+            <h3>🛒 Magasin</h3>
+            <p class="muted">Composez votre panier avec les produits du marché et recevez-le chez vous dans la journée.</p>
+            <ul>
+              <li>Produits frais sélectionnés par nos fournisseuses</li>
+              <li>Prix alignés sur le marché traditionnel</li>
+              <li>Livraison dès <strong id="fee-from">1 000 FCFA</strong></li>
+            </ul>
+            <a class="btn btn--primary" href="magasin.html">Faire mes courses</a>
+          </article>
+          <article class="card plan is-featured">
+            <span class="pill pill--orange">B2B · Commerçants</span>
+            <h3>📦 TokpaExpress</h3>
+            <p class="muted">Approvisionnez votre boutique en gros sans la fermer : vos cartons livrés au prix du marché Tokpa.</p>
+            <ul>
+              <li>Dès <strong>5 000 FCFA/mois</strong> pour 2 livraisons</li>
+              <li><strong>7 000 FCFA/mois</strong> pour 3 livraisons</li>
+              <li>Tableau de rentabilité offert</li>
+            </ul>
+            <a class="btn btn--orange" href="tokpaexpress.html">Découvrir TokpaExpress</a>
+          </article>
+          <article class="card plan">
+            <span class="pill">B2B2C · Vendeurs</span>
+            <h3>🏪 Marketplace</h3>
+            <p class="muted">Restaurateurs, artisans, commerçants : ouvrez votre boutique en ligne et gardez 100 % de vos ventes.</p>
+            <ul>
+              <li><strong>0 % de commission</strong></li>
+              <li>Abonnement dès 20 000 FCFA/mois</li>
+              <li>1<sup>er</sup> mois offert</li>
+            </ul>
+            <a class="btn btn--primary" href="vendre.html">Ouvrir ma boutique</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Catégories -->
+    <section class="section section--white">
+      <div class="container">
+        <div class="section-head">
+          <div><p class="eyebrow">Magasin</p><h2>Vos rayons du marché</h2></div>
+          <a class="link-arrow" href="magasin.html">Tout voir →</a>
+        </div>
+        <div class="grid grid-4" id="home-cats"></div>
+      </div>
+    </section>
+
+    <!-- Produits populaires -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div><p class="eyebrow">Les plus demandés</p><h2>Produits populaires cette semaine</h2></div>
+          <a class="link-arrow" href="magasin.html">Tous les produits →</a>
+        </div>
+        <div class="grid grid-4 grid--products" id="home-products"></div>
+      </div>
+    </section>
+
+    <!-- Comment ça marche -->
+    <section class="section section--sand">
+      <div class="container">
+        <div class="section-head">
+          <div><p class="eyebrow">Comment ça marche</p><h2>Du marché à votre porte, en quelques heures</h2></div>
+          <a class="link-arrow" href="livraison.html">Livraison &amp; logistique →</a>
+        </div>
+        <ol class="steps-list" style="grid-template-columns:repeat(5,1fr)" id="how-steps"></ol>
+      </div>
+    </section>
+
+    <!-- Boutiques à la une -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div><p class="eyebrow">Service de marketplace</p><h2>Achetez auprès de commerçants béninois</h2></div>
+          <a class="link-arrow" href="marketplace.html">Toutes les boutiques →</a>
+        </div>
+        <div class="grid grid-4" id="home-shops"></div>
+      </div>
+    </section>
+
+    <!-- Paniers prêts -->
+    <section class="section section--white">
+      <div class="container">
+        <div class="section-head">
+          <div><p class="eyebrow">Gagnez du temps</p><h2>Paniers prêts à commander</h2></div>
+          <a class="link-arrow" href="magasin.html#paniers">Voir les paniers →</a>
+        </div>
+        <div class="grid grid-3" id="home-bundles"></div>
+      </div>
+    </section>
+
+    <!-- Témoignages -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div><p class="eyebrow">« LocalBox, c'est moi »</p><h2>Ils font vivre LocalBox</h2></div>
+        </div>
+        <div class="grid grid-3" id="home-testimonials"></div>
+      </div>
+    </section>
+
+    <!-- Paiement & confiance -->
+    <section class="section section--white">
+      <div class="container">
+        <div class="grid grid-4">
+          <div class="card card-body"><h3>📱 Mobile Money</h3><p class="muted">Payez avec MTN MoMo, Moov Money ou Celtiis Cash, sans carte bancaire.</p></div>
+          <div class="card card-body"><h3>💵 Paiement à la livraison</h3><p class="muted">Vous préférez payer à réception ? C'est possible, en espèces ou par MoMo.</p></div>
+          <div class="card card-body"><h3>🔒 Livraison sécurisée</h3><p class="muted">Panier scellé et confirmation par QR code : seul vous pouvez réceptionner votre commande.</p></div>
+          <div class="card card-body"><h3>↩️ Satisfait ou remboursé</h3><p class="muted">Produit manquant ou abîmé ? Remplacement ou remboursement, réclamation traitée sous 7 jours ouvrés.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fidélité -->
+    <section class="section section--sand">
+      <div class="container" style="display:grid;grid-template-columns:1.2fr 1fr;gap:32px;align-items:center" id="loyalty-block">
+        <div>
+          <p class="eyebrow">Programme de fidélité</p>
+          <h2>Gagnez des LocalPoints à chaque commande</h2>
+          <p>Commandez, laissez un avis, parrainez vos proches : vos points se transforment en livraisons offertes, bons d'achat et cadeaux. Les 1 000 premiers clients fidèles rejoignent le <strong>Club des 1000 Premiers</strong> et reçoivent leur carte de pionnier.</p>
+          <div class="hero-ctas"><a class="btn btn--primary" href="fidelite.html">Découvrir le programme</a><a class="btn btn--ghost" href="compte.html">Créer mon compte</a></div>
+        </div>
+        <div class="card card-body" style="text-align:center">
+          <div style="font-size:3.5rem">🏆</div>
+          <h3>Trophées à partager</h3>
+          <p class="muted">« Reine / Roi du Marché » à 50 commandes, « Marchand Élite » à 100 ventes, « Livraison Express » pour nos meilleurs livreurs…</p>
+          <a class="link-arrow" href="fidelite.html#hall-of-fame">Voir le Hall of Fame →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Blog -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div><p class="eyebrow">Blog</p><h2>Le #CarnetDuMarché</h2></div>
+          <a class="link-arrow" href="blog.html">Tous les articles →</a>
+        </div>
+        <div class="grid grid-3" id="home-posts"></div>
+      </div>
+    </section>
+
+    <!-- Rejoindre -->
+    <section class="join-band">
+      <div class="container">
+        <h2>Rejoignez LocalBox !</h2>
+        <p class="muted">Commerçant, artisan, restaurateur ou fournisseuse du marché : grandissons ensemble.</p>
+        <div class="hero-ctas" style="justify-content:center">
+          <a class="btn btn--primary" href="vendre.html">Devenir partenaire</a>
+          <a class="btn btn--ghost" href="tokpaexpress.html">S'abonner à TokpaExpress</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const { D, C, ICON, qs, esc, fmt, productCard, merchantCard } = LB;
+
+      qs("#features").innerHTML = [
+        [ICON.handshake, "Partenariats locaux"],
+        [ICON.truck, "Livraison flexible"],
+        [ICON.store, "Service de marketplace"],
+        [ICON.bag, "Vente directe en ligne"]
+      ].map(([i, t]) => "<li>" + i + "<span>" + t + "</span></li>").join("");
+
+      // Offres du moment (rotation)
+      const promos = [
+        { href: "vendre.html", brand: "🏪 Marketplace", text: "1er MOIS OFFERT POUR LES NOUVEAUX VENDEURS" },
+        { href: "tokpaexpress.html", brand: "📦 TokpaExpress", text: "VOS CARTONS LIVRÉS DÈS 5 000 FCFA / MOIS" },
+        { href: "fidelite.html", brand: "🏆 LocalPoints", text: "50 POINTS OFFERTS À L'INSCRIPTION" }
+      ];
+      let pi = 0;
+      const banner = qs("#promo-banner");
+      const showPromo = () => {
+        const p = promos[pi % promos.length];
+        banner.href = p.href;
+        banner.innerHTML = '<span class="ad-tag">OFFRE</span><span class="ad-brand">' + p.brand + "</span><span>DÉCOUVREZ NOS OFFRES DU MOMENT · " + p.text + "</span>";
+        pi++;
+      };
+      showPromo();
+      setInterval(showPromo, 5000);
+
+      qs("#fee-from").textContent = fmt(Math.min.apply(null, C.zones.filter((z) => z.status === "active").map((z) => z.fee)));
+
+      qs("#home-cats").innerHTML = D.magasinCategories.slice(0, 8).map((c) =>
+        '<a class="card cat-card" href="magasin.html?cat=' + c.id + '"><span class="emoji">' + c.emoji + "</span><strong>" + esc(c.name) + "</strong><span>" + esc(c.desc) + "</span></a>"
+      ).join("") + '<a class="card cat-card" href="marketplace.html"><span class="emoji">🏪</span><strong>Marketplace</strong><span>Restaurants, artisans, beauté</span></a>';
+
+      qs("#home-products").innerHTML = D.products.filter((p) => p.popular).slice(0, 8).map(productCard).join("");
+
+      const steps = [
+        ["Je commande", "Je compose mon panier sur le site ou l'appli et je vois ma facture détaillée."],
+        ["Je choisis mon lieu", "Maison, Travail ou Autre : ma position est enregistrée pour les prochaines fois."],
+        ["Achats au marché", "Nos agents achètent mes produits chez des fournisseuses partenaires de confiance."],
+        ["Panier scellé", "Au mini-hub, mes courses sont réunies dans un emballage LocalBox scellé et étiqueté."],
+        ["Livré & confirmé", "Le livreur me remet mon panier ; je vérifie et je confirme par QR code."]
+      ];
+      qs("#how-steps").innerHTML = steps.map((s) => "<li><h3>" + s[0] + '</h3><p class="muted" style="margin:0">' + s[1] + "</p></li>").join("");
+
+      qs("#home-shops").innerHTML = D.shops.slice(0, 4).map(merchantCard).join("");
+
+      qs("#home-bundles").innerHTML = D.bundles.map((b) => {
+        const total = Object.entries(b.items).reduce((n, [id, q]) => n + D.products.find((p) => p.id === id).price * q, 0);
+        return '<article class="card product-card"><div class="p-thumb">' + b.emoji + '</div><div class="card-body"><h3>' + esc(b.name) + '</h3><p class="seller">' + esc(b.desc) + '</p><div class="price-row"><span class="price">' + fmt(total) + '</span><button class="btn btn--orange btn--sm" data-bundle="' + b.id + '">Ajouter le panier</button></div></div></article>';
+      }).join("");
+      document.addEventListener("click", (e) => {
+        const b = e.target.closest("[data-bundle]");
+        if (!b) return;
+        const bundle = D.bundles.find((x) => x.id === b.dataset.bundle);
+        const items = LB.cart.items();
+        Object.entries(bundle.items).forEach(([id, q]) => {
+          const line = items.find((l) => l.type === "magasin" && l.id === id);
+          if (line) line.qty += q; else items.push({ type: "magasin", id, shopId: null, qty: q });
+        });
+        LB.cart.save(items);
+        LB.toast("✓ " + bundle.name + " ajouté au panier");
+      });
+
+      qs("#home-testimonials").innerHTML = D.testimonials.map((t) =>
+        '<figure class="card testimonial"><span class="pill">' + esc(t.segment) + "</span><blockquote>« " + esc(t.text) + ' »</blockquote><figcaption class="person"><span class="avatar">' + esc(t.initials) + "</span><span><strong>" + esc(t.name) + "</strong><span>" + esc(t.place) + "</span></span></figcaption></figure>"
+      ).join("");
+
+      qs("#home-posts").innerHTML = D.posts.slice(0, 3).map((p) =>
+        '<a class="card post-card" href="article.html?id=' + p.id + '"><div class="post-cover" style="background:' + p.color + '">' + p.emoji + '</div><div class="card-body"><span class="post-meta">' + esc(p.cat) + " · " + p.read + "</span><h3>" + esc(p.title) + "</h3><p>" + esc(p.excerpt) + "</p></div></a>"
+      ).join("");
+
+      // Mise en page responsive du bloc fidélité
+      const mq = window.matchMedia("(max-width: 900px)");
+      const lb = qs("#loyalty-block");
+      const steps2 = qs("#how-steps");
+      const apply = () => {
+        lb.style.gridTemplateColumns = mq.matches ? "1fr" : "1.2fr 1fr";
+        steps2.style.gridTemplateColumns = mq.matches ? "" : "repeat(5,1fr)";
+      };
+      mq.addEventListener("change", apply);
+      apply();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vendre sur LocalBox — Ouvrez votre boutique en ligne sans commission</title>
+  <meta name="description" content="Commerçants, artisans, restaurateurs : ouvrez votre boutique LocalBox dès 20 000 FCFA/mois, 0 % de commission, 1er mois offert. Fournisseuses du marché : devenez partenaires.">
+  <meta name="theme-color" content="#cc6e28">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="vendre">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <section class="supplier-hero">
+      <div class="container">
+        <h1>Service fournisseur</h1>
+        <p>Diffusez vos produits sur notre plateforme</p>
+        <div class="supplier-tiles" id="tiles"></div>
+      </div>
+    </section>
+
+    <section class="section--tight">
+      <div class="container"><a class="ad-banner" href="#inscription"><span class="ad-tag">OFFRE</span><span class="ad-brand">🎁 Lancement</span><span>1<sup>er</sup> MOIS OFFERT · 0 % DE COMMISSION SUR VOS VENTES</span></a></div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head"><div><p class="eyebrow">Marketplace · B2B2C</p><h2>Votre boutique en ligne, clé en main</h2></div><p>Pour les commerçants, restaurateurs, artisans et prestataires qui veulent vendre en ligne sans développer de site.</p></div>
+        <div class="grid grid-4">
+          <div class="card card-body"><h3>🏪 Boutique personnalisée</h3><p class="muted">Photos, prix, descriptions, horaires d'ouverture affichés en direct (🟢 Ouvert / 🔴 Fermé) et délai de préparation.</p></div>
+          <div class="card card-body"><h3>👥 Clients LocalBox</h3><p class="muted">Profitez de la base d'utilisateurs qui fait déjà ses courses sur LocalBox.</p></div>
+          <div class="card card-body"><h3>💳 Paiement sécurisé</h3><p class="muted">Mobile Money, carte ou paiement à la livraison : LocalBox s'occupe de l'encaissement.</p></div>
+          <div class="card card-body"><h3>0️⃣ Aucune commission</h3><p class="muted">Vous gardez 100 % de chaque vente. Un abonnement fixe, c'est tout.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tarifs -->
+    <section class="section section--white" id="tarifs">
+      <div class="container">
+        <div class="section-head"><div><p class="eyebrow">Tarifs</p><h2>Composez votre abonnement</h2></div><p>Choisissez seulement les options dont vous avez besoin.</p></div>
+        <div class="cart-layout">
+          <div class="grid" style="gap:14px">
+            <div class="card plan">
+              <div class="summary-row"><h3 style="margin:0">Abonnement de base</h3><span class="plan-price" style="font-size:1.5rem" id="p-base"></span></div>
+              <ul><li>Création de la boutique en ligne et gestion autonome du catalogue</li><li>Accès aux clients LocalBox, visibilité par catégorie et par nom</li><li>Système de paiement sécurisé</li><li>Tableau de bord : commandes, stock, historique</li><li>Support standard (WhatsApp, téléphone)</li></ul>
+            </div>
+            <label class="card plan" style="cursor:pointer">
+              <div class="summary-row"><span class="check" style="padding:0"><input type="checkbox" id="opt-logistique" checked> <strong style="font-size:1.1rem">Option logistique</strong></span><span class="plan-price" style="font-size:1.3rem">+<span id="p-log"></span></span></div>
+              <span class="muted">Un livreur LocalBox (ou partenaire) récupère vos commandes à la boutique pendant vos horaires et les livre au client, avec confirmation par QR code. Sans cette option : retrait en boutique, livreur du client ou votre propre livreur.</span>
+            </label>
+            <label class="card plan" style="cursor:pointer">
+              <div class="summary-row"><span class="check" style="padding:0"><input type="checkbox" id="opt-stats"> <strong style="font-size:1.1rem">Option statistiques avancées</strong></span><span class="plan-price" style="font-size:1.3rem">+<span id="p-stats"></span></span></div>
+              <span class="muted">Chiffre d'affaires jour/semaine/mois, panier moyen, fidélité, produits les plus vendus et les moins populaires, zones et heures des clients, délais de livraison, alertes et recommandations automatiques.</span>
+            </label>
+          </div>
+          <div class="card card-body summary">
+            <h3>Votre abonnement</h3>
+            <div id="sim"></div>
+            <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+            <h3 style="font-size:1rem">Simulateur : combien vous gardez ?</h3>
+            <div class="field"><label for="sales">Vos ventes mensuelles sur LocalBox</label><input class="input" type="number" id="sales" value="300000" step="10000" min="0"></div>
+            <div id="sim2" style="margin-top:10px"></div>
+            <a class="btn btn--orange btn--block" href="#inscription" style="margin-top:14px">Ouvrir ma boutique</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fonctionnement -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head"><div><p class="eyebrow">Fonctionnement</p><h2>De la commande à la remise au client</h2></div></div>
+        <div class="grid grid-2">
+          <div class="card card-body"><h3>🛵 Avec l'option logistique</h3>
+            <ol style="padding-left:18px;margin:0;display:grid;gap:6px">
+              <li>Une alerte vous prévient instantanément à chaque commande.</li>
+              <li>Vous préparez la commande dans le délai indiqué, emballée aux standards LocalBox (sac kraft, boîte rigide) avec une étiquette QR code.</li>
+              <li>Un livreur est automatiquement assigné et passe la récupérer pendant vos horaires.</li>
+              <li>Le client confirme la réception par QR code ; un reçu est envoyé et votre tableau de bord se met à jour.</li>
+            </ol>
+          </div>
+          <div class="card card-body"><h3>🏬 Sans l'option logistique</h3>
+            <ol style="padding-left:18px;margin:0;display:grid;gap:6px">
+              <li>Vous préparez la commande et proposez au client l'un des trois modes de remise :</li>
+              <li><strong>Retrait en boutique</strong> (adresse visible sur le reçu) ;</li>
+              <li><strong>Livreur du client</strong> (Gozem ou indépendant) ;</li>
+              <li><strong>Votre livreur de confiance</strong>, facturé au client ou inclus dans le prix.</li>
+              <li>Remise sur présentation du code ou scan du QR code, puis clôture de la commande.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Accompagnement -->
+    <section class="section section--sand">
+      <div class="container">
+        <div class="section-head"><div><p class="eyebrow">« Mon commerce, ma fierté »</p><h2>On vous accompagne pour réussir</h2></div></div>
+        <div class="grid grid-4">
+          <div class="card card-body"><h3>📸 Portrait offert</h3><p class="muted">Pour les premiers vendeurs : un portrait photo professionnel de votre commerce en tête de boutique et une courte vidéo de votre savoir-faire.</p></div>
+          <div class="card card-body"><h3>🎓 Journées du Commerce Digital</h3><p class="muted">Ateliers gratuits chaque mois : vendre en ligne en 10 étapes, photographier ses produits au smartphone, gérer ses commandes.</p></div>
+          <div class="card card-body"><h3>🧰 Kit de bienvenue</h3><p class="muted">Tutoriel, aide personnalisée pour vos 10 premiers produits et bon d'achat pour découvrir LocalBox côté client.</p></div>
+          <div class="card card-body"><h3>🤝 Parrainage vendeur</h3><p class="muted">Faites inscrire un autre commerçant : visibilité boostée et réduction sur votre abonnement.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Inscription -->
+    <section class="section" id="inscription">
+      <div class="container contact-grid">
+        <form class="card card-body form" id="shop-form" novalidate>
+          <h2 style="font-size:1.4rem">Ouvrir ma boutique</h2>
+          <div class="form-row">
+            <div class="field"><label for="s-name">Nom de la boutique *</label><input class="input" id="s-name" required></div>
+            <div class="field"><label for="s-cat">Catégorie *</label><select class="select" id="s-cat" required></select></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="s-owner">Votre nom *</label><input class="input" id="s-owner" required autocomplete="name"></div>
+            <div class="field"><label for="s-phone">Téléphone / WhatsApp *</label><input class="input" id="s-phone" type="tel" required autocomplete="tel" placeholder="01 XX XX XX XX"></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="s-city">Ville *</label><select class="select" id="s-city"><option>Cotonou</option><option>Abomey-Calavi</option><option>Porto-Novo</option><option>Parakou</option><option>Abomey</option><option>Bohicon</option><option>Comé</option><option>Ouidah</option><option>Autre</option></select></div>
+            <div class="field"><label for="s-district">Quartier / adresse *</label><input class="input" id="s-district" required></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="s-open">Ouverture</label><input class="input" id="s-open" type="time" value="08:00"></div>
+            <div class="field"><label for="s-close">Fermeture</label><input class="input" id="s-close" type="time" value="19:00"></div>
+          </div>
+          <div class="field"><label for="s-prep">Délai moyen de préparation</label><select class="select" id="s-prep"><option>30 min</option><option>1 h</option><option>2 h</option><option>Le jour même</option><option>2 à 3 jours</option><option>Sur rendez-vous</option></select></div>
+          <div class="field"><label for="s-desc">Présentez votre activité</label><textarea class="textarea" id="s-desc" placeholder="Ce que vous vendez, votre savoir-faire, votre histoire…"></textarea></div>
+          <label class="check"><input type="checkbox" id="s-log" checked> Option logistique (+10 000 FCFA/mois)</label>
+          <label class="check"><input type="checkbox" id="s-stats"> Option statistiques avancées (+10 000 FCFA/mois)</label>
+          <div class="field"><label for="s-ref">Code de parrainage vendeur (facultatif)</label><input class="input" id="s-ref"></div>
+          <label class="check"><input type="checkbox" id="s-cgu" required> J'accepte les <a href="cgu.html#vendeurs" target="_blank">conditions vendeurs</a>.</label>
+          <div class="form-msg" id="s-msg" role="alert"></div>
+          <button class="btn btn--orange" type="submit">Créer ma boutique — 1<sup>er</sup> mois offert</button>
+        </form>
+        <div>
+          <div class="card card-body" style="margin-bottom:16px">
+            <h3>Ce qu'il vous faut</h3>
+            <ul class="spec-list" style="margin:0"><li>Un téléphone avec WhatsApp</li><li>Quelques photos de vos produits</li><li>Vos prix et vos horaires</li><li>Un compte Mobile Money pour recevoir vos paiements</li></ul>
+          </div>
+          <div class="card card-body" style="margin-bottom:16px">
+            <h3>Déjà vendeur ?</h3>
+            <p class="muted">Accédez à vos commandes, votre stock et vos statistiques.</p>
+            <a class="btn btn--primary" href="tableau-de-bord.html">Mon tableau de bord</a>
+          </div>
+          <div class="card card-body">
+            <h3>Une question ?</h3>
+            <p class="muted">Notre équipe Marketplace vous accompagne pour créer votre boutique.</p>
+            <a class="btn btn--whatsapp" id="wa-sell" target="_blank" rel="noopener">Écrire sur WhatsApp</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fournisseurs -->
+    <section class="section section--white" id="fournisseurs">
+      <div class="container contact-grid">
+        <div>
+          <p class="eyebrow">Fournisseuses &amp; grossistes du marché</p>
+          <h2>Devenez « Fournisseur LocalBox »</h2>
+          <p>Commerçantes de Dantokpa et du nouveau marché de gros : nos agents achètent chez vous pour préparer les paniers du Magasin et les commandes TokpaExpress. Vous gagnez des ventes régulières sans changer vos habitudes.</p>
+          <ul class="spec-list">
+            <li>Commandes groupées régulières, payées rapidement</li>
+            <li>Espace partenaire pour voir les commandes qui vous concernent et signaler quand tout est prêt</li>
+            <li>Visibilité : votre nom sur les fiches produit et dans le #CarnetDuMarché</li>
+            <li>Rôle d'ambassadrice LocalBox auprès des commerçants du marché</li>
+          </ul>
+          <p class="muted">Critères de sélection : fiabilité, qualité des produits, prix et disponibilité.</p>
+        </div>
+        <form class="card card-body form" id="supplier-form" novalidate>
+          <h3>Proposer mes produits</h3>
+          <div class="field"><label for="f-name">Nom et prénom *</label><input class="input" id="f-name" required></div>
+          <div class="field"><label for="f-phone">Téléphone *</label><input class="input" id="f-phone" type="tel" required></div>
+          <div class="field"><label for="f-market">Marché / emplacement *</label><input class="input" id="f-market" required placeholder="Ex. : Dantokpa, rangée des tomates"></div>
+          <div class="field"><label for="f-products">Produits vendus *</label><textarea class="textarea" id="f-products" required style="min-height:80px" placeholder="Ex. : tomates, piment, oignons — au détail et en gros"></textarea></div>
+          <label class="check"><input type="checkbox" id="f-gros"> Je vends aussi en gros (cartons, sacs) pour TokpaExpress</label>
+          <div class="form-msg" id="f-msg" role="alert"></div>
+          <button class="btn btn--primary" type="submit">Être rappelée par un agent</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const { C, D, ICON, qs, esc, fmt, auth, store, uid, waLink } = LB;
+      const M = C.marketplace;
+
+      qs("#tiles").innerHTML = [[ICON.chart, "Statistiques de vente", "Suivez votre chiffre d'affaires"], [ICON.box, "Interface de gestion de stock", "Prix, stocks, catalogue"], [ICON.clock, "Historique de commande", "Toutes vos ventes tracées"]]
+        .map((t) => '<a class="supplier-tile" href="tableau-de-bord.html" style="text-decoration:none">' + t[0] + t[1] + "<span>" + t[2] + "</span></a>").join("");
+
+      qs("#p-base").textContent = fmt(M.basePrice);
+      qs("#p-log").textContent = fmt(M.options[0].price);
+      qs("#p-stats").textContent = fmt(M.options[1].price);
+      qs("#wa-sell").href = waLink(null, "Bonjour, je souhaite ouvrir ma boutique sur LocalBox.");
+      qs("#s-cat").innerHTML = D.shopCategories.map((c) => '<option value="' + c.id + '">' + c.emoji + " " + esc(c.name) + "</option>").join("");
+
+      function sim() {
+        const log = qs("#opt-logistique").checked, stats = qs("#opt-stats").checked;
+        const total = M.basePrice + (log ? M.options[0].price : 0) + (stats ? M.options[1].price : 0);
+        qs("#sim").innerHTML = '<div class="summary-row"><span>Base</span><span>' + fmt(M.basePrice) + "</span></div>" +
+          (log ? '<div class="summary-row"><span>Logistique</span><span>' + fmt(M.options[0].price) + "</span></div>" : "") +
+          (stats ? '<div class="summary-row"><span>Statistiques avancées</span><span>' + fmt(M.options[1].price) + "</span></div>" : "") +
+          '<div class="summary-row total"><span>Par mois</span><span>' + fmt(total) + '</span></div><p class="muted" style="font-size:.88rem;margin:6px 0 0">Premier mois : <strong>0 FCFA</strong>. Commission sur les ventes : <strong>0 %</strong>.</p>';
+        const sales = Math.max(0, +qs("#sales").value || 0);
+        const commission = Math.round(sales * 0.15);
+        qs("#sim2").innerHTML = '<div class="summary-row"><span>Sur LocalBox, vous gardez</span><strong style="color:var(--green)">' + fmt(sales - total) + "</strong></div>" +
+          '<div class="summary-row muted"><span>Avec une commission de 15 % (pratique courante des grandes plateformes, 10–20 %)</span><span>' + fmt(sales - commission) + "</span></div>";
+        qs("#s-log").checked = log; qs("#s-stats").checked = stats;
+      }
+      ["#opt-logistique", "#opt-stats", "#sales"].forEach((s) => qs(s).addEventListener("input", sim));
+      sim();
+
+      qs("#shop-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const msg = qs("#s-msg");
+        const req = ["#s-name", "#s-owner", "#s-phone", "#s-district"];
+        const miss = req.filter((s) => !qs(s).value.trim());
+        if (miss.length || !qs("#s-cgu").checked) { msg.className = "form-msg is-err"; msg.textContent = miss.length ? "Merci de compléter les champs obligatoires (*)." : "Merci d'accepter les conditions vendeurs."; return; }
+        const u = auth.login({ name: qs("#s-owner").value.trim(), phone: qs("#s-phone").value.trim(), role: "vendeur" });
+        u.shop = {
+          id: uid("S-"), name: qs("#s-name").value.trim(), cat: qs("#s-cat").value, city: qs("#s-city").value, district: qs("#s-district").value.trim(),
+          hours: { days: [1, 2, 3, 4, 5, 6], open: qs("#s-open").value, close: qs("#s-close").value }, prep: qs("#s-prep").value, about: qs("#s-desc").value.trim(),
+          logistics: qs("#s-log").checked, stats: qs("#s-stats").checked, createdAt: new Date().toISOString(), trialUntil: new Date(Date.now() + 30 * 864e5).toISOString(),
+          products: [], orders: []
+        };
+        auth.save(u);
+        location.href = "tableau-de-bord.html?welcome=1";
+      });
+
+      qs("#supplier-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const msg = qs("#f-msg");
+        const miss = ["#f-name", "#f-phone", "#f-market", "#f-products"].filter((s) => !qs(s).value.trim());
+        if (miss.length) { msg.className = "form-msg is-err"; msg.textContent = "Merci de compléter les champs obligatoires (*)."; return; }
+        store.set("suppliers", store.get("suppliers", []).concat([{ name: qs("#f-name").value, phone: qs("#f-phone").value, market: qs("#f-market").value, products: qs("#f-products").value, gros: qs("#f-gros").checked, date: new Date().toISOString() }]));
+        e.target.reset();
+        msg.className = "form-msg is-ok"; msg.textContent = "Merci ! Un agent LocalBox passera vous voir au marché ou vous appellera sous 48 h.";
+      });
+    })();
+  </script>
+</body>
+</html>

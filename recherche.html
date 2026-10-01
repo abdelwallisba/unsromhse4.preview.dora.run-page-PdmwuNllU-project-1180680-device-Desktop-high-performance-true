@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recherche | LocalBox</title>
+  <meta name="description" content="Rechercher des produits, des boutiques et des plats sur LocalBox.">
+  <meta name="theme-color" content="#cc6e28">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="recherche">
+  <div id="site-header"></div>
+  <main id="main"><section class="section"><div class="container" id="results"></div></section></main>
+  <div id="site-footer"></div>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const { D, qs, esc, param, productCard, merchantCard, shopProductCard } = LB;
+      const q = (param("q") || "").trim();
+      const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+      const words = norm(q).split(/\s+/).filter(Boolean);
+      const match = (txt) => words.length && words.every((w) => norm(txt).includes(w));
+
+      const products = D.products.filter((p) => match(p.name + " " + p.desc + " " + p.origin + " " + p.supplier));
+      const shops = D.shops.filter((s) => match(s.name + " " + s.tagline + " " + s.city + " " + s.district));
+      const shopItems = D.shops.flatMap((s) => s.products.filter((p) => match(p.name)).map((p) => ({ s, p })));
+
+      const total = products.length + shops.length + shopItems.length;
+      qs("#results").innerHTML = "<h1>" + (q ? "Résultats pour « " + esc(q) + " »" : "Rechercher") + '</h1><p class="muted">' + total + " résultat(s)</p>" +
+        (products.length ? '<h2 style="margin-top:28px">🛒 Magasin</h2><div class="grid grid-4 grid--products">' + products.map(productCard).join("") + "</div>" : "") +
+        (shops.length ? '<h2 style="margin-top:28px">🏪 Boutiques</h2><div class="grid grid-4">' + shops.map(merchantCard).join("") + "</div>" : "") +
+        (shopItems.length ? '<h2 style="margin-top:28px">🍲 Dans les boutiques</h2><div class="grid grid-4 grid--products">' + shopItems.map((x) => shopProductCard(x.s, x.p).replace("<h3>", '<h3><a href="boutique.html?id=' + x.s.id + '" class="seller" style="display:block;font-weight:500">' + esc(x.s.name) + "</a>")).join("") + "</div>" : "") +
+        (!total ? '<div class="empty card"><span class="emoji">🔍</span>Aucun résultat. Essayez « tomate », « gari », « poisson », « karité »…<br><a class="btn btn--primary" style="margin-top:12px" href="contact.html?sujet=produit">Demander un produit</a></div>' : "");
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mon panier | LocalBox</title>
+  <meta name="description" content="Votre panier LocalBox : livraison, créneau, paiement Mobile Money ou à la livraison.">
+  <meta name="theme-color" content="#cc6e28">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="panier">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <section class="section">
+      <div class="container">
+        <div class="steps" aria-label="Étapes">
+          <span class="step is-active" id="st1"><b>1</b>Panier</span>
+          <span class="step" id="st2"><b>2</b>Livraison &amp; paiement</span>
+          <span class="step" id="st3"><b>3</b>Confirmation</span>
+        </div>
+        <h1>Mon panier</h1>
+        <div id="cart-root"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modale paiement Mobile Money -->
+  <div class="modal" id="pay-modal" role="dialog" aria-modal="true" aria-labelledby="pay-title">
+    <div class="modal-box">
+      <h2 id="pay-title">Confirmez le paiement</h2>
+      <p id="pay-text"></p>
+      <div class="card card-body" style="background:var(--cream)">
+        <p style="margin:0">⏳ En attente de votre validation sur le téléphone…</p>
+      </div>
+      <div class="hero-ctas" style="margin-top:16px">
+        <button class="btn btn--primary" id="pay-ok">J'ai validé sur mon téléphone</button>
+        <button class="btn btn--ghost" id="pay-cancel">Annuler</button>
+      </div>
+      <p class="muted" style="font-size:.85rem;margin-top:12px">Version de démonstration : aucun débit réel n'est effectué. L'intégration de l'agrégateur de paiement Mobile Money est prévue à la mise en production.</p>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const { D, C, qs, qsa, esc, fmt, cart, auth, orders, uid, toast, thumb } = LB;
+      const root = qs("#cart-root");
+      const activeZones = C.zones.filter((z) => z.status === "active");
+      const form = { zone: 0, express: false, usePoints: false, promo: "", handover: {} };
+
+      /* Regroupe les lignes : Magasin LocalBox puis chaque boutique */
+      function groups() {
+        const lines = cart.detailed().filter((l) => l.type !== "gros");
+        const map = new Map();
+        lines.forEach((l) => {
+          const k = l.type === "magasin" ? "magasin" : l.shopId;
+          if (!map.has(k)) map.set(k, { key: k, shop: l.type === "shop" ? l.item.shop : null, lines: [] });
+          map.get(k).lines.push(l);
+        });
+        return Array.from(map.values());
+      }
+
+      function totals() {
+        const gs = groups();
+        const zone = activeZones[form.zone];
+        let subtotal = 0, delivery = 0;
+        gs.forEach((g) => {
+          const st = g.lines.reduce((n, l) => n + l.total, 0);
+          subtotal += st;
+          if (!g.shop) delivery += st >= C.magasin.freeDeliveryFrom ? 0 : zone.fee;
+          else if (g.shop.logistics) delivery += zone.fee;
+          else if ((form.handover[g.shop.id] || "retrait") === "vendeur") delivery += zone.fee;
+        });
+        const express = form.express ? C.magasin.expressFee : 0;
+        const u = auth.user();
+        const pointsDiscount = form.usePoints && u && u.points >= 300 ? Math.min(delivery, zone.fee) : 0;
+        const promoDiscount = /^LB[A-Z0-9]{5}$/.test(form.promo) && (!u || u.referral !== form.promo) ? 500 : 0;
+        const total = Math.max(0, subtotal + delivery + express - pointsDiscount - promoDiscount);
+        return { gs, subtotal, delivery, express, pointsDiscount, promoDiscount, total, points: Math.floor(subtotal / 1000) * C.points.perThousand };
+      }
+
+      function linesHtml() {
+        return totals().gs.map((g) => {
+          const head = g.shop
+            ? '<div class="card-body" style="border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><strong>🏪 ' + esc(g.shop.name) + '</strong><span class="muted">Boutique Marketplace · ' + esc(g.shop.city) + (g.shop.logistics ? " · Livré par LocalBox" : " · Remise par le vendeur") + "</span></div>"
+            : '<div class="card-body" style="border-bottom:1px solid var(--line)"><strong>🛒 Magasin LocalBox</strong> <span class="muted">· Panier multi-fournisseurs préparé au mini-hub</span></div>';
+          return '<div class="card" style="margin-bottom:16px">' + head + g.lines.map((l) =>
+            '<div class="cart-item"><div class="thumb">' + thumb(l.item) + "</div>" +
+            "<div><strong>" + esc(l.item.name) + '</strong><div class="muted" style="font-size:.88rem">' + esc(l.item.unit) + " · " + fmt(l.item.price) + '</div><button class="link-btn" data-remove="' + l.key + '">Retirer</button></div>' +
+            '<div style="text-align:right"><div class="qty"><button data-dec="' + l.key + '" aria-label="Diminuer">−</button><span>' + l.qty + '</span><button data-inc="' + l.key + '" aria-label="Augmenter">+</button></div><div class="price" style="margin-top:6px">' + fmt(l.total) + "</div></div></div>"
+          ).join("") + "</div>";
+        }).join("");
+      }
+
+      function summaryHtml(withButton) {
+        const t = totals();
+        return '<div class="card card-body summary"><h3>Récapitulatif</h3>' +
+          '<div class="summary-row"><span>Sous-total</span><strong>' + fmt(t.subtotal) + "</strong></div>" +
+          '<div class="summary-row"><span>Livraison</span><strong>' + (t.delivery ? fmt(t.delivery) : "Offerte") + "</strong></div>" +
+          (t.express ? '<div class="summary-row"><span>Express (~2 h)</span><strong>' + fmt(t.express) + "</strong></div>" : "") +
+          (t.pointsDiscount ? '<div class="summary-row" style="color:var(--success)"><span>LocalPoints (−300 pts)</span><strong>−' + fmt(t.pointsDiscount) + "</strong></div>" : "") +
+          (t.promoDiscount ? '<div class="summary-row" style="color:var(--success)"><span>Code parrainage</span><strong>−' + fmt(t.promoDiscount) + "</strong></div>" : "") +
+          '<div class="summary-row total"><span>Net à payer</span><span>' + fmt(t.total) + "</span></div>" +
+          '<p class="muted" style="font-size:.88rem;margin:10px 0">🏆 Vous gagnerez <strong>' + t.points + " LocalPoints</strong> avec cette commande.</p>" +
+          (t.subtotal < C.magasin.freeDeliveryFrom && t.gs.some((g) => !g.shop) ? '<p class="muted" style="font-size:.88rem">🎁 Plus que ' + fmt(C.magasin.freeDeliveryFrom - t.gs.filter((g) => !g.shop).reduce((n, g) => n + g.lines.reduce((a, l) => a + l.total, 0), 0)) + " pour la livraison Magasin offerte.</p>" : "") +
+          (withButton ? '<a class="btn btn--orange btn--block" href="#" id="go-checkout">Valider mon panier</a><a class="btn btn--ghost btn--block" style="margin-top:8px" href="magasin.html">Continuer mes achats</a>' : "") +
+          "</div>";
+      }
+
+      /* Étape 1 — panier */
+      function renderCart() {
+        setStep(1);
+        if (!cart.detailed().filter((l) => l.type !== "gros").length) {
+          root.innerHTML = '<div class="empty card"><span class="emoji">🧺</span><h2>Votre panier est vide</h2><p>Parcourez le Magasin ou les boutiques de la Marketplace.</p><div class="hero-ctas" style="justify-content:center"><a class="btn btn--primary" href="magasin.html">Aller au Magasin</a><a class="btn btn--ghost" href="marketplace.html">Voir la Marketplace</a></div></div>';
+          return;
+        }
+        root.innerHTML = '<div class="cart-layout"><div>' + linesHtml() + "</div><div>" + summaryHtml(true) + "</div></div>";
+        qs("#go-checkout").addEventListener("click", (e) => { e.preventDefault(); renderCheckout(); });
+      }
+
+      root.addEventListener("click", (e) => {
+        const inc = e.target.closest("[data-inc]"), dec = e.target.closest("[data-dec]"), rm = e.target.closest("[data-remove]");
+        if (!inc && !dec && !rm) return;
+        const key = (inc || dec || rm).dataset.inc || (inc || dec || rm).dataset.dec || (inc || dec || rm).dataset.remove;
+        const line = cart.detailed().find((l) => l.key === key);
+        if (!line) return;
+        cart.setQty(key, rm ? 0 : line.qty + (inc ? 1 : -1));
+        renderCart();
+      });
+
+      /* Étape 2 — livraison & paiement */
+      function renderCheckout() {
+        setStep(2);
+        const u = auth.user();
+        const saved = (u && u.addresses && u.addresses[0]) || {};
+        const today = new Date();
+        const dateOpt = (d, label) => '<option value="' + d.toISOString().slice(0, 10) + '">' + label + " — " + d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }) + "</option>";
+        const tomorrow = new Date(today.getTime() + 864e5), after = new Date(today.getTime() + 2 * 864e5);
+        const nonLogShops = totals().gs.filter((g) => g.shop && !g.shop.logistics);
+
+        root.innerHTML = '<div class="cart-layout"><form class="form" id="checkout" novalidate>' +
+          '<div class="card card-body form"><h2 style="font-size:1.25rem">1. Vos coordonnées</h2>' +
+          '<div class="form-row"><div class="field"><label for="f-name">Nom et prénom *</label><input class="input" id="f-name" required autocomplete="name" value="' + esc(u ? u.name : "") + '"></div>' +
+          '<div class="field"><label for="f-phone">Téléphone (WhatsApp) *</label><input class="input" id="f-phone" required type="tel" autocomplete="tel" placeholder="01 XX XX XX XX" value="' + esc(u ? u.phone : "") + '"></div></div>' +
+          '<div class="field"><label for="f-email">E-mail (facultatif)</label><input class="input" id="f-email" type="email" autocomplete="email" value="' + esc(u ? u.email : "") + '"></div></div>' +
+
+          '<div class="card card-body form"><h2 style="font-size:1.25rem">2. Lieu de livraison</h2>' +
+          '<div class="faq-cats" role="radiogroup" aria-label="Type de lieu">' + ["Maison", "Travail", "Autre"].map((p, i) => '<label class="chip' + ((saved.type || "Maison") === p ? " is-active" : "") + '"><input type="radio" name="place" value="' + p + '" class="sr-only"' + ((saved.type || "Maison") === p ? " checked" : "") + ">" + ["🏠 ", "💼 ", "📍 "][i] + p + "</label>").join("") + "</div>" +
+          '<div class="form-row"><div class="field"><label for="f-zone">Zone *</label><select class="select" id="f-zone">' + activeZones.map((z, i) => '<option value="' + i + '">' + esc(z.name) + " — " + fmt(z.fee) + "</option>").join("") + "</select></div>" +
+          '<div class="field"><label for="f-district">Quartier *</label><input class="input" id="f-district" required value="' + esc(saved.district || "") + '" placeholder="Ex. : Agla, von de la pharmacie"></div></div>' +
+          '<div class="field"><label for="f-address">Repères pour le livreur *</label><textarea class="textarea" id="f-address" required style="min-height:80px" placeholder="Ex. : portail bleu après la boutique Chez Paul, 2e von à gauche">' + esc(saved.address || "") + "</textarea></div>" +
+          '<button type="button" class="btn btn--ghost btn--sm" id="geo">📍 Utiliser ma position actuelle</button><span class="muted" id="geo-status" style="font-size:.88rem"></span>' +
+          '<p class="hint muted" style="font-size:.85rem;margin:0">Votre lieu est enregistré pour vos prochaines commandes.</p></div>' +
+
+          '<div class="card card-body form"><h2 style="font-size:1.25rem">3. Créneau</h2>' +
+          '<div class="form-row"><div class="field"><label for="f-date">Jour</label><select class="select" id="f-date">' + dateOpt(today, "Aujourd'hui") + dateOpt(tomorrow, "Demain") + dateOpt(after, "Après-demain") + "</select></div>" +
+          '<div class="field"><label for="f-slot">Heure</label><select class="select" id="f-slot">' + C.magasin.slots.map((s) => "<option>" + s + "</option>").join("") + "</select></div></div>" +
+          '<label class="check"><input type="checkbox" id="f-express"> ⚡ Livraison express en ~2 h (+' + fmt(C.magasin.expressFee) + ")</label>" +
+          '<div class="field"><label for="f-note">Message au livreur (facultatif)</label><input class="input" id="f-note" placeholder="Ex. : laisser le colis au gardien"></div></div>' +
+
+          (nonLogShops.length ? '<div class="card card-body form"><h2 style="font-size:1.25rem">4. Remise des commandes boutiques</h2>' + nonLogShops.map((g) =>
+            '<fieldset style="border:0;padding:0;margin:0"><legend><strong>' + esc(g.shop.name) + "</strong> <span class=\"muted\">(" + esc(g.shop.district) + ", " + esc(g.shop.city) + ')</span></legend>' +
+            '<label class="check"><input type="radio" name="ho-' + g.shop.id + '" value="retrait" checked> Je retire à la boutique (adresse sur le reçu)</label>' +
+            '<label class="check"><input type="radio" name="ho-' + g.shop.id + '" value="mon-livreur"> J\'envoie mon propre livreur (Gozem ou indépendant)</label>' +
+            '<label class="check"><input type="radio" name="ho-' + g.shop.id + '" value="vendeur"> Le vendeur fait livrer (frais de zone appliqués)</label></fieldset>'
+          ).join("") + "</div>" : "") +
+
+          '<div class="card card-body form"><h2 style="font-size:1.25rem">' + (nonLogShops.length ? "5" : "4") + ". Paiement</h2>" +
+          '<div class="pay-options">' +
+          [["mtn", "mtn", "MoMo", "MTN Mobile Money"], ["moov", "moov", "Moov", "Moov Money"], ["celtiis", "celtiis", "Celtiis", "Celtiis Cash"], ["livraison", "cash", "Cash", "Paiement à la livraison (espèces ou MoMo)"], ["carte", "card", "Carte", "Carte bancaire"]]
+            .map((m, i) => '<label class="pay-option"><input type="radio" name="pay" value="' + m[0] + '"' + (i === 0 ? " checked" : "") + '><span class="pay-logo ' + m[1] + '">' + m[2] + "</span>" + m[3] + "</label>").join("") +
+          "</div>" +
+          '<div class="field" id="momo-field"><label for="f-momo">Numéro Mobile Money</label><input class="input" id="f-momo" type="tel" placeholder="01 XX XX XX XX" value="' + esc(u ? u.phone : "") + '"></div>' +
+          '<div class="form-row"><div class="field"><label for="f-promo">Code parrainage</label><input class="input" id="f-promo" placeholder="Ex. : LB4F7KQ" style="text-transform:uppercase"></div>' +
+          '<div class="field" style="align-self:end">' + (u && u.points >= 300 ? '<label class="check"><input type="checkbox" id="f-points"> Utiliser 300 LocalPoints : livraison offerte (solde : ' + u.points + " pts)</label>" : '<span class="muted" style="font-size:.88rem">🏆 ' + (u ? "Solde : " + u.points + " pts (300 pts = livraison offerte)" : "Connectez-vous pour utiliser vos LocalPoints") + "</span>") + "</div></div>" +
+          '<label class="check"><input type="checkbox" id="f-cgv" required> J\'accepte les <a href="cgu.html" target="_blank">conditions générales de vente</a> et la <a href="retours.html" target="_blank">politique de retour</a>.</label>' +
+          '<div class="form-msg" id="form-msg" role="alert"></div>' +
+          '<div class="hero-ctas"><button type="button" class="btn btn--ghost" id="back">← Modifier le panier</button><button type="submit" class="btn btn--orange" id="submit">Payer et commander</button></div></div>' +
+          '</form><div id="summary-host"></div></div>';
+
+        const refresh = () => {
+          qs("#summary-host").innerHTML = '<div class="card" style="margin-bottom:12px"><div class="card-body"><strong>' + cart.count() + " article(s)</strong></div>" +
+            cart.detailed().filter((l) => l.type !== "gros").map((l) => '<div class="summary-row" style="padding:0 18px 6px"><span>' + l.qty + " × " + esc(l.item.name) + "</span><span>" + fmt(l.total) + "</span></div>").join("") + "</div>" + summaryHtml(false);
+          qs("#submit").textContent = (qs('input[name="pay"]:checked').value === "livraison" ? "Commander · " : "Payer · ") + fmt(totals().total);
+        };
+
+        const slotSel = qs("#f-slot");
+        const updateSlots = () => {
+          const isToday = qs("#f-date").value === new Date().toISOString().slice(0, 10);
+          const hour = new Date().getHours() + 1; // préparation minimale d'1 h
+          const ok = C.magasin.slots.filter((s) => !isToday || parseInt(s.split("–")[1], 10) > hour + 1);
+          if (isToday && !ok.length) { qs("#f-date").selectedIndex = 1; return updateSlots(); }
+          slotSel.innerHTML = ok.map((s) => "<option>" + s + "</option>").join("");
+        };
+        qs("#f-date").addEventListener("change", updateSlots);
+        updateSlots();
+
+        qsa('input[name="place"]').forEach((r) => r.addEventListener("change", () => qsa('input[name="place"]').forEach((x) => x.parentElement.classList.toggle("is-active", x.checked))));
+        qs("#f-zone").addEventListener("change", (e) => { form.zone = +e.target.value; refresh(); });
+        qs("#f-express").addEventListener("change", (e) => { form.express = e.target.checked; refresh(); });
+        qs("#f-promo").addEventListener("input", (e) => { form.promo = e.target.value.trim().toUpperCase(); refresh(); });
+        if (qs("#f-points")) qs("#f-points").addEventListener("change", (e) => { form.usePoints = e.target.checked; refresh(); });
+        nonLogShops.forEach((g) => qsa('input[name="ho-' + g.shop.id + '"]').forEach((r) => r.addEventListener("change", () => { form.handover[g.shop.id] = r.value; refresh(); })));
+        qsa('input[name="pay"]').forEach((r) => r.addEventListener("change", () => {
+          qs("#momo-field").style.display = ["mtn", "moov", "celtiis"].includes(r.value) ? "" : "none";
+          refresh();
+        }));
+        qs("#back").addEventListener("click", renderCart);
+
+        let geo = saved.geo || null;
+        qs("#geo").addEventListener("click", () => {
+          const st = qs("#geo-status");
+          if (!navigator.geolocation) { st.textContent = " Géolocalisation indisponible sur cet appareil."; return; }
+          st.textContent = " Localisation en cours…";
+          navigator.geolocation.getCurrentPosition(
+            (pos) => { geo = { lat: +pos.coords.latitude.toFixed(5), lng: +pos.coords.longitude.toFixed(5) }; st.textContent = " ✓ Position enregistrée (" + geo.lat + ", " + geo.lng + ")"; },
+            () => { st.textContent = " Impossible d'obtenir la position. Merci de préciser vos repères."; },
+            { timeout: 10000 }
+          );
+        });
+
+        qs("#checkout").addEventListener("submit", (e) => {
+          e.preventDefault();
+          const msg = qs("#form-msg");
+          const required = ["#f-name", "#f-phone", "#f-district", "#f-address"];
+          const missing = required.filter((s) => !qs(s).value.trim());
+          const phoneOk = /^[0-9 +]{8,16}$/.test(qs("#f-phone").value.trim());
+          if (missing.length || !phoneOk || !qs("#f-cgv").checked) {
+            msg.className = "form-msg is-err";
+            msg.textContent = missing.length ? "Merci de compléter les champs obligatoires (*)." : !phoneOk ? "Le numéro de téléphone semble incorrect." : "Merci d'accepter les conditions générales de vente.";
+            (missing[0] ? qs(missing[0]) : qs("#f-phone")).focus();
+            return;
+          }
+          const method = qs('input[name="pay"]:checked').value;
+          const place = qs('input[name="place"]:checked').value;
+          const data = {
+            name: qs("#f-name").value.trim(), phone: qs("#f-phone").value.trim(), email: qs("#f-email").value.trim(),
+            place, zone: activeZones[form.zone].name, district: qs("#f-district").value.trim(), address: qs("#f-address").value.trim(), geo,
+            date: qs("#f-date").value, slot: qs("#f-slot").value, note: qs("#f-note").value.trim(), method, momo: qs("#f-momo").value.trim()
+          };
+          if (["mtn", "moov", "celtiis"].includes(method)) {
+            const labels = { mtn: "MTN MoMo", moov: "Moov Money", celtiis: "Celtiis Cash" };
+            qs("#pay-text").innerHTML = "Une demande de paiement de <strong>" + fmt(totals().total) + "</strong> a été envoyée au <strong>" + esc(data.momo || data.phone) + "</strong> (" + labels[method] + "). Validez-la avec votre code secret.";
+            const modal = qs("#pay-modal");
+            modal.classList.add("is-open");
+            qs("#pay-ok").onclick = () => { modal.classList.remove("is-open"); placeOrder(data, "payee"); };
+            qs("#pay-cancel").onclick = () => modal.classList.remove("is-open");
+          } else {
+            placeOrder(data, method === "carte" ? "payee" : "a-la-livraison");
+          }
+        });
+
+        refresh();
+      }
+
+      function placeOrder(data, payStatus) {
+        const t = totals();
+        let u = auth.user() || auth.login({ name: data.name, phone: data.phone, email: data.email });
+        u.addresses = [{ type: data.place, zone: data.zone, district: data.district, address: data.address, geo: data.geo }].concat((u.addresses || []).filter((a) => a.type !== data.place)).slice(0, 3);
+        if (t.pointsDiscount) u.points -= 300;
+        auth.save(u);
+
+        const order = orders.create({
+          id: uid("LB-"),
+          createdAt: new Date().toISOString(),
+          customer: { name: data.name, phone: data.phone, email: data.email },
+          delivery: { place: data.place, zone: data.zone, district: data.district, address: data.address, geo: data.geo, date: data.date, slot: data.slot, express: form.express, note: data.note },
+          groups: t.gs.map((g) => ({
+            shop: g.shop ? { id: g.shop.id, name: g.shop.name, city: g.shop.city, district: g.shop.district, logistics: g.shop.logistics } : null,
+            handover: g.shop && !g.shop.logistics ? (form.handover[g.shop.id] || "retrait") : "localbox",
+            lines: g.lines.map((l) => ({ type: l.type, id: l.id, shopId: l.shopId, name: l.item.name, unit: l.item.unit, price: l.item.price, qty: l.qty, emoji: l.item.emoji }))
+          })),
+          payment: { method: data.method, status: payStatus },
+          subtotal: t.subtotal, deliveryFee: t.delivery, express: t.express, discount: t.pointsDiscount + t.promoDiscount, total: t.total,
+          pointsEarned: t.points,
+          qr: uid("QR-") + "-" + Math.random().toString(36).slice(2, 8).toUpperCase(),
+          status: "confirmee"
+        });
+
+        const n = orders.all().length;
+        auth.addPoints(t.points, "Commande " + order.id);
+        if (n % 5 === 0) auth.addPoints(C.points.fifthOrderBonus, "Bonus " + n + "e commande");
+        cart.clear();
+        location.href = "commande.html?id=" + encodeURIComponent(order.id) + "&new=1";
+      }
+
+      function setStep(n) { [1, 2, 3].forEach((i) => qs("#st" + i).classList.toggle("is-active", i <= n)); }
+
+      renderCart();
+      document.addEventListener("cart:change", () => { if (!qs("#checkout")) renderCart(); });
+    })();
+  </script>
+</body>
+</html>

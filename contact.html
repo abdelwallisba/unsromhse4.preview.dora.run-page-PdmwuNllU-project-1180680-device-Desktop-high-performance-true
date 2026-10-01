@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact | LocalBox</title>
+  <meta name="description" content="Contactez LocalBox : formulaire, WhatsApp, téléphone, e-mail. Basés à Cotonou, Bénin.">
+  <meta name="theme-color" content="#cc6e28">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="contact">
+  <div id="site-header"></div>
+  <main id="main">
+    <section class="page-banner"><div class="container"><h1>Contact</h1><p>Une question, une suggestion, un partenariat ? Nous sommes à votre écoute.</p></div></section>
+    <section class="section">
+      <div class="container contact-grid">
+        <form class="card card-body form" id="contact-form" novalidate>
+          <h2 style="font-size:1.4rem">Écrivez-nous</h2>
+          <div class="form-row">
+            <div class="field"><label for="c-name">Nom *</label><input class="input" id="c-name" required autocomplete="name"></div>
+            <div class="field"><label for="c-phone">Téléphone / WhatsApp *</label><input class="input" id="c-phone" type="tel" required autocomplete="tel"></div>
+          </div>
+          <div class="field"><label for="c-email">E-mail</label><input class="input" id="c-email" type="email" autocomplete="email"></div>
+          <div class="field"><label for="c-subject">Sujet</label>
+            <select class="select" id="c-subject">
+              <option value="commande">Question sur une commande</option>
+              <option value="produit">Demander un produit</option>
+              <option value="tokpa">TokpaExpress</option>
+              <option value="vendeur">Ouvrir une boutique / Marketplace</option>
+              <option value="fournisseur">Devenir fournisseur</option>
+              <option value="livreur">Devenir livreur</option>
+              <option value="partenariat">Partenariat / investisseurs / presse</option>
+              <option value="evenement">Inviter LocalBox à un événement</option>
+              <option value="test">Retour de testeur / bug</option>
+              <option value="autre">Autre</option>
+            </select>
+          </div>
+          <div class="field"><label for="c-msg">Message *</label><textarea class="textarea" id="c-msg" required></textarea></div>
+          <label class="check"><input type="checkbox" id="c-consent"> J'accepte que mes données soient utilisées pour traiter ma demande (<a href="confidentialite.html">confidentialité</a>).</label>
+          <div class="form-msg" id="c-out" role="alert"></div>
+          <button class="btn btn--primary" type="submit">Envoyer</button>
+        </form>
+        <div>
+          <ul class="contact-list card card-body" id="coords"></ul>
+          <div style="margin-top:16px"><iframe class="map" id="map" title="Carte : LocalBox à Cotonou" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const { C, qs, esc, param, store, waLink } = LB;
+      const c = C.contact;
+      qs("#coords").innerHTML =
+        '<li><span class="ico">💬</span><div><strong>WhatsApp Business</strong><br><a target="_blank" rel="noopener" href="' + waLink(null, "Bonjour LocalBox !") + '">Discuter avec nous</a></div></li>' +
+        '<li><span class="ico">📞</span><div><strong>Téléphone</strong><br><a href="tel:' + c.phone.replace(/\s/g, "") + '">' + esc(c.phone) + "</a></div></li>" +
+        '<li><span class="ico">📩</span><div><strong>SMS TokpaExpress</strong><br>Envoyez « TOKPA » au ' + esc(c.sms) + "</div></li>" +
+        '<li><span class="ico">✉️</span><div><strong>E-mail</strong><br><a href="mailto:' + esc(c.email) + '">' + esc(c.email) + "</a></div></li>" +
+        '<li><span class="ico">📍</span><div><strong>Adresse</strong><br>' + esc(c.address) + "</div></li>" +
+        '<li><span class="ico">🕒</span><div><strong>Horaires du service client</strong><br>' + esc(c.hours) + "</div></li>";
+      qs("#map").src = "https://www.google.com/maps?q=" + encodeURIComponent(c.mapQuery) + "&output=embed";
+      if (param("sujet")) qs("#c-subject").value = param("sujet");
+
+      qs("#contact-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const out = qs("#c-out");
+        const miss = ["#c-name", "#c-phone", "#c-msg"].filter((s) => !qs(s).value.trim());
+        if (miss.length || !qs("#c-consent").checked) { out.className = "form-msg is-err"; out.textContent = miss.length ? "Merci de compléter les champs obligatoires (*)." : "Merci d'accepter l'utilisation de vos données."; return; }
+        store.set("messages", store.get("messages", []).concat([{ name: qs("#c-name").value, phone: qs("#c-phone").value, email: qs("#c-email").value, subject: qs("#c-subject").value, msg: qs("#c-msg").value, date: new Date().toISOString() }]));
+        e.target.reset();
+        out.className = "form-msg is-ok"; out.textContent = "Merci ! Nous vous répondons sous 24 h (souvent bien plus vite sur WhatsApp).";
+      });
+    })();
+  </script>
+</body>
+</html>

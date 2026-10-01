@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Livraison &amp; logistique — Zones, tarifs et suivi | LocalBox</title>
+  <meta name="description" content="Livraison LocalBox le jour même à Cotonou et Abomey-Calavi : zones, tarifs, créneaux, mini-hubs, confirmation par QR code et suivi en temps réel.">
+  <meta name="theme-color" content="#cc6e28">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="livraison">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <section class="page-banner">
+      <div class="container">
+        <h1>Livraison &amp; logistique</h1>
+        <p>Du marché à votre porte le jour même, avec une chaîne logistique pensée pour le commerce béninois.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container contact-grid">
+        <div>
+          <h2>Zones et tarifs</h2>
+          <p class="muted">Phase pilote à Cotonou et Abomey-Calavi, puis extension progressive ville par ville.</p>
+          <div class="table-wrap card">
+            <table class="table zone-table">
+              <thead><tr><th>Zone</th><th>Délai</th><th>Statut</th><th>Frais</th></tr></thead>
+              <tbody id="zones"></tbody>
+            </table>
+          </div>
+          <ul class="spec-list">
+            <li>Livraison Magasin offerte dès <strong id="free"></strong> d'achats</li>
+            <li>Option express en ~2 heures : <strong id="express"></strong></li>
+            <li>Créneaux de 2 heures, de 8h à 20h, du lundi au samedi</li>
+          </ul>
+        </div>
+        <div>
+          <form class="card card-body form" id="track">
+            <h3>📦 Suivre ma commande</h3>
+            <div class="field"><label for="track-id">Numéro de commande</label><input class="input" id="track-id" placeholder="Ex. : LB-M1ABCD2EFG" required></div>
+            <button class="btn btn--primary" type="submit">Suivre</button>
+            <p class="muted" style="font-size:.88rem;margin:0">Retrouvez aussi toutes vos commandes dans <a href="compte.html#commandes">Mon compte</a>.</p>
+          </form>
+          <div class="card card-body" style="margin-top:16px">
+            <h3>🗺️ Votre ville n'est pas encore couverte ?</h3>
+            <p class="muted">Laissez-nous votre contact : nous vous prévenons dès que LocalBox arrive chez vous.</p>
+            <form class="form" id="waitlist"><input class="input" id="wl-city" placeholder="Votre ville" required><input class="input" id="wl-phone" placeholder="Téléphone ou WhatsApp" required><button class="btn btn--ghost" type="submit">Me prévenir</button></form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--white">
+      <div class="container">
+        <div class="section-head"><div><p class="eyebrow">Notre organisation</p><h2>Un réseau de mini-hubs au plus près de vous</h2></div></div>
+        <div class="grid grid-3">
+          <div class="card card-body"><h3>🏪 Achats groupés au marché</h3><p class="muted">Les commandes arrivent instantanément chez nos agents de terrain, positionnés dans les marchés partenaires. Ils regroupent les achats par vague auprès de fournisseuses sélectionnées pour leur fiabilité, leur qualité et leurs prix.</p></div>
+          <div class="card card-body"><h3>📦 Mini-hubs de quartier</h3><p class="muted">Vos produits sont réunis dans un point de convergence local (Akpakpa, Cococodji, Calavi…), contrôlés puis placés dans un emballage LocalBox scellé et étiqueté.</p></div>
+          <div class="card card-body"><h3>🛵 Tournées optimisées</h3><p class="muted">Les commandes d'un même quartier partent ensemble, sur un itinéraire calculé selon la distance, le trafic et vos créneaux. Un même trajet peut livrer un particulier, une boutique et un colis Marketplace.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container contact-grid">
+        <div>
+          <p class="eyebrow">Sécurité</p>
+          <h2>Confirmation par QR code</h2>
+          <p>Chaque commande dispose d'un QR code unique, visible dans votre compte. À l'arrivée du livreur :</p>
+          <ol style="display:grid;gap:8px;padding-left:20px">
+            <li>Vous vérifiez le contenu de votre panier (vous pouvez l'ouvrir avec le livreur en cas de doute).</li>
+            <li>Vous présentez votre QR code ; le livreur le scanne.</li>
+            <li>La livraison est confirmée, horodatée, et votre reçu est envoyé.</li>
+          </ol>
+          <p class="muted">Seul le bon destinataire peut réceptionner la commande. Pour TokpaExpress, un code PIN peut remplacer le QR code.</p>
+        </div>
+        <div class="card card-body">
+          <h3>Suivi en temps réel</h3>
+          <div class="track-steps"><div class="done">Confirmée</div><div class="done">En préparation</div><div class="done">En route</div><div>Livrée</div></div>
+          <ul class="spec-list" style="margin-top:22px">
+            <li>Notifications à chaque étape : créneau confirmé, départ du hub, arrivée imminente</li>
+            <li>Reprogrammation possible si vous êtes absent</li>
+            <li>Message au livreur (« laisser au gardien »…)</li>
+            <li>Retrait au hub de votre quartier en alternative</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--sand">
+      <div class="container">
+        <div class="section-head"><div><p class="eyebrow">Nos livreurs</p><h2>Une charte qualité pour chaque livraison</h2></div></div>
+        <div class="grid grid-4">
+          <div class="card card-body"><h3>🤝 Partenaires</h3><p class="muted">Livreurs LocalBox, coursiers indépendants sélectionnés et partenaires de mobilité urbaine (partenariat avec Gozem visé).</p></div>
+          <div class="card card-body"><h3>⏰ Ponctualité</h3><p class="muted">Respect des créneaux, information proactive en cas de retard.</p></div>
+          <div class="card card-body"><h3>🧊 Soin des produits</h3><p class="muted">Glacières pour le frais, manipulation précautionneuse, emballages scellés.</p></div>
+          <div class="card card-body"><h3>📍 Traçabilité</h3><p class="muted">Trajets suivis par GPS, scans à la prise en charge et à la remise.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container grid grid-2">
+        <div class="card card-body">
+          <h3>En cas d'incident</h3>
+          <p class="muted">Retard, colis endommagé, article manquant : vous êtes prévenu sans délai et LocalBox reste votre interlocuteur unique. Si vous n'êtes pas responsable, la solution ne vous coûte rien : article renvoyé gratuitement, déduit de la facture ou remboursé. Colis perdu ? Nous le réexpédions à nos frais ou vous remboursons intégralement.</p>
+          <a class="link-arrow" href="retours.html">Retours &amp; réclamations →</a>
+        </div>
+        <div class="card card-body">
+          <h3>🌱 Une logistique plus verte</h3>
+          <p class="muted">Tournées mutualisées, moins de trajets à vide, et à terme des vélos-cargos et motos électriques au départ des mini-hubs, ainsi que des emballages réutilisables pour le frais.</p>
+          <a class="link-arrow" href="a-venir.html">Nos projets →</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const { C, qs, esc, fmt, store, toast } = LB;
+      const S = { active: '<span class="status status--done">Actif</span>', soon: '<span class="status status--prep">Bientôt</span>', planned: '<span class="status status--ship">Prévu</span>' };
+      qs("#zones").innerHTML = C.zones.map((z) => "<tr><td>" + esc(z.name) + "</td><td>" + esc(z.delay) + "</td><td>" + S[z.status] + "</td><td>" + (z.fee ? fmt(z.fee) : "—") + "</td></tr>").join("");
+      qs("#free").textContent = fmt(C.magasin.freeDeliveryFrom);
+      qs("#express").textContent = "+" + fmt(C.magasin.expressFee);
+      qs("#track").addEventListener("submit", (e) => { e.preventDefault(); location.href = "commande.html?id=" + encodeURIComponent(qs("#track-id").value.trim().toUpperCase()); });
+      qs("#waitlist").addEventListener("submit", (e) => {
+        e.preventDefault();
+        store.set("waitlist", store.get("waitlist", []).concat([{ city: qs("#wl-city").value, contact: qs("#wl-phone").value, date: new Date().toISOString() }]));
+        e.target.reset(); toast("Merci ! Nous vous préviendrons à l'arrivée de LocalBox.");
+      });
+    })();
+  </script>
+</body>
+</html>

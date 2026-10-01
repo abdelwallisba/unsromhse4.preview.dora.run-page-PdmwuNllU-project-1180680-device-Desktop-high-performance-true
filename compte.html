@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mon compte | LocalBox</title>
+  <meta name="description" content="Espace client LocalBox : commandes, adresses, LocalPoints, parrainage et réclamations.">
+  <meta name="theme-color" content="#cc6e28">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="compte">
+  <div id="site-header"></div>
+  <main id="main"><section class="section"><div class="container" id="account-root"></div></section></main>
+  <div id="site-footer"></div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const { C, qs, qsa, esc, fmt, auth, orders, store, STATUS, toast, waLink } = LB;
+      const root = qs("#account-root");
+
+      /* ---------- Connexion / inscription (code SMS simulé) ---------- */
+      function renderAuth(mode) {
+        mode = mode || "login";
+        root.innerHTML = '<div class="auth-wrap"><h1 class="center">' + (mode === "login" ? "Connexion" : "Créer mon compte") + '</h1>' +
+          '<div class="tabs" role="tablist"><button data-mode="login"' + (mode === "login" ? ' class="is-active"' : "") + '>Se connecter</button><button data-mode="signup"' + (mode === "signup" ? ' class="is-active"' : "") + ">Créer un compte</button></div>" +
+          '<form class="card card-body form" id="auth-form" novalidate>' +
+          (mode === "signup" ? '<div class="field"><label for="a-name">Nom et prénom *</label><input class="input" id="a-name" required autocomplete="name"></div>' +
+            '<fieldset style="border:0;padding:0;margin:0"><legend><strong>Je suis…</strong></legend>' +
+            '<label class="pay-option"><input type="radio" name="role" value="client" checked> 🛒 Un particulier (courses, Marketplace)</label>' +
+            '<label class="pay-option"><input type="radio" name="role" value="tokpa"> 📦 Un commerçant (approvisionnement TokpaExpress)</label>' +
+            '<label class="pay-option"><input type="radio" name="role" value="vendeur"> 🏪 Un vendeur (boutique Marketplace)</label></fieldset>' : "") +
+          '<div class="field"><label for="a-phone">Numéro de téléphone *</label><input class="input" id="a-phone" type="tel" required autocomplete="tel" placeholder="01 XX XX XX XX"></div>' +
+          '<div class="field" id="otp-field" style="display:none"><label for="a-otp">Code reçu par SMS</label><input class="input" id="a-otp" inputmode="numeric" maxlength="4" placeholder="••••"><p class="hint">Démonstration : saisissez <strong>1234</strong>.</p></div>' +
+          (mode === "signup" ? '<div class="field"><label for="a-ref">Code de parrainage (facultatif)</label><input class="input" id="a-ref" style="text-transform:uppercase"></div><label class="check"><input type="checkbox" id="a-cgu"> J\'accepte les <a href="cgu.html" target="_blank">CGU</a> et la <a href="confidentialite.html" target="_blank">politique de confidentialité</a>.</label>' : "") +
+          '<div class="form-msg" id="a-msg" role="alert"></div>' +
+          '<button class="btn btn--primary btn--block" type="submit" id="a-submit">Recevoir mon code</button>' +
+          '<p class="muted center" style="font-size:.88rem;margin:0">🎁 ' + (mode === "signup" ? "50 LocalPoints offerts à l'inscription." : "Pas encore de compte ? Il est créé automatiquement à votre première commande.") + "</p></form></div>";
+
+        qsa("[data-mode]").forEach((b) => b.addEventListener("click", () => renderAuth(b.dataset.mode)));
+        let step = 1;
+        qs("#auth-form").addEventListener("submit", (e) => {
+          e.preventDefault();
+          const msg = qs("#a-msg");
+          const phone = qs("#a-phone").value.trim();
+          if (!/^[0-9 +]{8,16}$/.test(phone)) { msg.className = "form-msg is-err"; msg.textContent = "Numéro de téléphone invalide."; return; }
+          if (mode === "signup" && (!qs("#a-name").value.trim() || !qs("#a-cgu").checked)) { msg.className = "form-msg is-err"; msg.textContent = "Merci d'indiquer votre nom et d'accepter les CGU."; return; }
+          if (step === 1) {
+            step = 2;
+            qs("#otp-field").style.display = "";
+            qs("#a-submit").textContent = "Valider";
+            msg.className = "form-msg is-ok"; msg.textContent = "Un code vous a été envoyé par SMS au " + phone + ".";
+            qs("#a-otp").focus();
+            return;
+          }
+          if (qs("#a-otp").value !== "1234") { msg.className = "form-msg is-err"; msg.textContent = "Code incorrect."; return; }
+          const role = mode === "signup" ? qs('input[name="role"]:checked').value : undefined;
+          const u = auth.login({ phone, name: mode === "signup" ? qs("#a-name").value.trim() : undefined, role });
+          if (mode === "signup" && qs("#a-ref").value.trim()) auth.addPoints(C.points.referral / 2, "Inscription avec parrainage");
+          if (role === "tokpa") location.href = "tokpaexpress.html#inscription";
+          else if (role === "vendeur") location.href = "vendre.html#inscription";
+          else renderAccount(location.hash.replace("#", "") || "dashboard");
+          toast("Bienvenue " + u.name.split(" ")[0] + " !");
+        });
+      }
+
+      /* ---------- Espace client ---------- */
+      const TABS = [["dashboard", "🏠 Accueil"], ["commandes", "🧾 Mes commandes"], ["adresses", "📍 Mes adresses"], ["points", "🏆 LocalPoints"], ["parrainage", "🤝 Parrainage"], ["reclamations", "🎫 Réclamations"], ["profil", "👤 Profil"]];
+
+      function renderAccount(tab) {
+        const u = auth.user();
+        if (!u) return renderAuth();
+        if (!TABS.some((t) => t[0] === tab)) tab = "dashboard";
+        root.innerHTML = '<div class="section-head"><div><p class="eyebrow">Mon compte</p><h1 style="margin:0">Bonjour ' + esc(u.name.split(" ")[0]) + " 👋</h1></div>" +
+          '<div class="hero-ctas">' + (u.tokpa ? '<a class="btn btn--orange btn--sm" href="tokpaexpress.html#espace-pro">Espace pro TokpaExpress</a>' : "") + (u.shop ? '<a class="btn btn--orange btn--sm" href="tableau-de-bord.html">Tableau de bord vendeur</a>' : "") + "</div></div>" +
+          '<div class="tabs" role="tablist">' + TABS.map((t) => '<button data-tab="' + t[0] + '"' + (t[0] === tab ? ' class="is-active"' : "") + ">" + t[1] + "</button>").join("") + '</div><div id="tab"></div>';
+        qsa("[data-tab]").forEach((b) => b.addEventListener("click", () => { history.replaceState(null, "", "#" + b.dataset.tab); renderAccount(b.dataset.tab); }));
+        ({ dashboard, commandes, adresses, points, parrainage, reclamations, profil })[tab](u);
+      }
+      const tabHtml = (h) => { qs("#tab").innerHTML = h; };
+
+      function orderRow(o) {
+        const s = STATUS[orders.liveStatus(o)];
+        const n = o.groups.reduce((a, g) => a + g.lines.reduce((b, l) => b + l.qty, 0), 0);
+        return "<tr><td><a href=\"commande.html?id=" + encodeURIComponent(o.id) + "\">" + esc(o.id) + "</a></td><td>" + new Date(o.createdAt).toLocaleDateString("fr-FR") + "</td><td>" + n + " article(s)</td><td>" + fmt(o.total) + '</td><td><span class="status ' + s.cls + '">' + s.label + '</span></td><td><a class="btn btn--ghost btn--sm" href="commande.html?id=' + encodeURIComponent(o.id) + '">Suivre</a></td></tr>';
+      }
+      function ordersTable(list) {
+        if (!list.length) return '<div class="empty card"><span class="emoji">🧺</span>Aucune commande pour le moment.<br><a class="btn btn--primary" style="margin-top:12px" href="magasin.html">Faire mes courses</a></div>';
+        return '<div class="table-wrap"><table class="table"><thead><tr><th>N°</th><th>Date</th><th>Contenu</th><th>Total</th><th>Statut</th><th></th></tr></thead><tbody>' + list.map(orderRow).join("") + "</tbody></table></div>";
+      }
+
+      function badges(u) {
+        const n = orders.all().filter((o) => o.status !== "annulee").length;
+        const list = [];
+        if (n >= 1) list.push("🛒 Première commande");
+        if (n >= 5) list.push("⭐ Client régulier");
+        if (n >= 50) list.push("🏆 Reine / Roi du Marché");
+        if (orders.all().some((o) => o.review)) list.push("💬 Contributeur");
+        if (u.tokpa) list.push("📦 Abonné TokpaExpress");
+        if (u.shop) list.push("🏪 Vendeur Marketplace");
+        return list;
+      }
+
+      function dashboard(u) {
+        const all = orders.all();
+        const current = all.filter((o) => !["livree", "annulee"].includes(orders.liveStatus(o)));
+        const n = all.filter((o) => o.status !== "annulee").length;
+        tabHtml('<div class="kpis"><div class="card kpi"><span>LocalPoints</span><strong>' + (u.points || 0) + '</strong><em>300 pts = livraison offerte</em></div><div class="card kpi"><span>Commandes</span><strong>' + n + '</strong><em>' + (n < 50 ? 50 - n + " avant « Reine/Roi du Marché »" : "Trophée débloqué !") + '</em></div><div class="card kpi"><span>En cours</span><strong>' + current.length + '</strong></div><div class="card kpi"><span>Club des 1000 Premiers</span><strong style="font-size:1.1rem">' + (n >= 3 ? "✅ Membre" : "Dès 3 commandes") + "</strong></div></div>" +
+          '<div class="grid grid-2"><div class="card card-body"><h3>Commandes en cours</h3>' + (current.length ? ordersTable(current) : '<p class="muted">Aucune commande en cours.</p>') + '</div><div class="card card-body"><h3>Mes badges</h3><div class="faq-cats">' + (badges(u).map((b) => '<span class="pill">' + b + "</span>").join("") || '<span class="muted">Passez votre première commande pour gagner un badge.</span>') + '</div><h3 style="margin-top:18px">Raccourcis</h3><div class="hero-ctas"><a class="btn btn--ghost btn--sm" href="magasin.html#paniers">Paniers prêts</a><a class="btn btn--ghost btn--sm" href="marketplace.html?cat=restaurants">Restaurants</a><a class="btn btn--ghost btn--sm" href="fidelite.html">Récompenses</a></div></div></div>');
+      }
+
+      function commandes() { tabHtml(ordersTable(orders.all())); }
+
+      function adresses(u) {
+        const types = ["Maison", "Travail", "Autre"];
+        tabHtml('<p class="muted">Vos lieux de livraison enregistrés. Ils sont proposés automatiquement à chaque commande.</p><div class="grid grid-3">' + types.map((t) => {
+          const a = (u.addresses || []).find((x) => x.type === t) || {};
+          return '<form class="card card-body form" data-addr="' + t + '"><h3>' + { Maison: "🏠", Travail: "💼", Autre: "📍" }[t] + " " + t + '</h3><div class="field"><label>Quartier</label><input class="input" name="district" value="' + esc(a.district || "") + '"></div><div class="field"><label>Repères</label><textarea class="textarea" name="address" style="min-height:70px">' + esc(a.address || "") + '</textarea></div><button class="btn btn--ghost btn--sm" type="submit">Enregistrer</button></form>';
+        }).join("") + "</div>");
+        qsa("[data-addr]").forEach((f) => f.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const t = f.dataset.addr;
+          u.addresses = (u.addresses || []).filter((x) => x.type !== t).concat([{ type: t, district: f.district.value.trim(), address: f.address.value.trim() }]);
+          auth.save(u); toast("Adresse « " + t + " » enregistrée.");
+        }));
+      }
+
+      function points(u) {
+        tabHtml('<div class="grid grid-2"><div class="card card-body"><h3>Solde : ' + (u.points || 0) + ' LocalPoints</h3><p class="muted">10 points par tranche de 1 000 FCFA · ' + C.points.review + " points par avis · " + C.points.referral + " points par parrainage · " + C.points.fifthOrderBonus + " points toutes les 5 commandes.</p>" +
+          '<h3 style="margin-top:12px">Échanger mes points</h3>' + C.points.rewards.map((r, i) => '<div class="summary-row" style="border-bottom:1px solid var(--line);padding:10px 0"><span>' + esc(r.label) + ' <span class="muted">· ' + r.pts + ' pts</span></span><button class="btn btn--sm ' + (u.points >= r.pts ? "btn--orange" : "btn--ghost") + '" data-reward="' + i + '"' + (u.points >= r.pts ? "" : " disabled") + ">Échanger</button></div>").join("") +
+          '</div><div class="card card-body"><h3>Historique</h3>' + ((u.pointsLog || []).slice().reverse().map((l) => '<div class="summary-row"><span>' + esc(l.reason) + ' <span class="muted" style="font-size:.8rem">' + new Date(l.date).toLocaleDateString("fr-FR") + '</span></span><strong style="color:' + (l.n >= 0 ? "var(--success)" : "var(--danger)") + '">' + (l.n >= 0 ? "+" : "") + l.n + "</strong></div>").join("") || '<p class="muted">50 points de bienvenue crédités.</p>') + "</div></div>");
+        qsa("[data-reward]").forEach((b) => b.addEventListener("click", () => {
+          const r = C.points.rewards[+b.dataset.reward];
+          if (!confirm("Échanger " + r.pts + " points contre : " + r.label + " ?")) return;
+          auth.addPoints(-r.pts, "Récompense : " + r.label);
+          const code = "RW-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+          store.set("rewards", store.get("rewards", []).concat([{ label: r.label, code, date: new Date().toISOString() }]));
+          toast("🎁 Récompense obtenue ! Code : " + code);
+          points(auth.user());
+        }));
+      }
+
+      function parrainage(u) {
+        const text = "Je fais mes courses du marché sur LocalBox 🧺 Inscris-toi avec mon code " + u.referral + " et profite de 500 FCFA de réduction sur ta première commande !";
+        tabHtml('<div class="card card-body" style="max-width:640px"><h3>Parrainez vos proches</h3><p>Votre code : <strong style="font-family:monospace;font-size:1.4rem">' + esc(u.referral) + "</strong></p><p class=\"muted\">Vos filleuls obtiennent 500 FCFA sur leur première commande, vous gagnez <strong>" + C.points.referral + ' LocalPoints</strong> à chaque premier achat.</p><div class="hero-ctas"><a class="btn btn--whatsapp" target="_blank" rel="noopener" href="' + waLink("", text) + '">Partager sur WhatsApp</a><button class="btn btn--ghost" id="copy">Copier le message</button></div></div>');
+        qs("#copy").addEventListener("click", () => { (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(() => toast("Message copié !"), () => toast(text)); });
+      }
+
+      function reclamations() {
+        const t = store.get("tickets", []);
+        tabHtml('<p class="muted">Engagement : réponse sous 48 h, résolution en moins de 7 jours ouvrés. Pour ouvrir une réclamation, rendez-vous sur le suivi de la commande concernée.</p>' + (t.length ? '<div class="table-wrap"><table class="table"><thead><tr><th>Ticket</th><th>Commande</th><th>Motif</th><th>Solution souhaitée</th><th>Ouvert le</th><th>Statut</th></tr></thead><tbody>' + t.map((x) => "<tr><td>" + esc(x.id) + '</td><td><a href="commande.html?id=' + encodeURIComponent(x.order) + '">' + esc(x.order) + "</a></td><td>" + esc(x.reason) + "</td><td>" + esc(x.solution) + "</td><td>" + new Date(x.createdAt).toLocaleDateString("fr-FR") + '</td><td><span class="status status--prep">' + esc(x.status) + "</span></td></tr>").join("") + "</tbody></table></div>" : '<div class="empty card"><span class="emoji">🎫</span>Aucune réclamation. Tant mieux !</div>'));
+      }
+
+      function profil(u) {
+        tabHtml('<form class="card card-body form" id="profile" style="max-width:560px"><div class="field"><label for="p-name">Nom</label><input class="input" id="p-name" value="' + esc(u.name) + '"></div><div class="field"><label for="p-phone">Téléphone</label><input class="input" id="p-phone" value="' + esc(u.phone) + '"></div><div class="field"><label for="p-email">E-mail</label><input class="input" id="p-email" type="email" value="' + esc(u.email || "") + '"></div><label class="check"><input type="checkbox" id="p-news"' + (u.news !== false ? " checked" : "") + '> Recevoir le #CarnetDuMarché et les offres (WhatsApp / e-mail)</label><div class="hero-ctas"><button class="btn btn--primary" type="submit">Enregistrer</button><button class="btn btn--ghost" type="button" id="logout">Se déconnecter</button></div><hr style="border:0;border-top:1px solid var(--line);width:100%"><button class="link-btn" type="button" id="wipe">Supprimer mon compte et mes données de cet appareil</button></form>');
+        qs("#profile").addEventListener("submit", (e) => { e.preventDefault(); Object.assign(u, { name: qs("#p-name").value.trim() || u.name, phone: qs("#p-phone").value.trim() || u.phone, email: qs("#p-email").value.trim(), news: qs("#p-news").checked }); auth.save(u); toast("Profil mis à jour."); });
+        qs("#logout").addEventListener("click", () => { auth.logout(); renderAuth(); toast("Vous êtes déconnecté."); });
+        qs("#wipe").addEventListener("click", () => {
+          if (!confirm("Supprimer définitivement votre compte, vos commandes et vos données de cet appareil ?")) return;
+          ["user", "orders", "tickets", "rewards", "cart", "tokpaOrders", "tokpaCart", "shopReviews"].forEach((k) => store.remove(k));
+          renderAuth(); toast("Données supprimées.");
+        });
+      }
+
+      const hash = location.hash.replace("#", "");
+      if (auth.user()) renderAccount(hash || "dashboard"); else renderAuth(hash === "inscription" ? "signup" : "login");
+    })();
+  </script>
+</body>
+</html>

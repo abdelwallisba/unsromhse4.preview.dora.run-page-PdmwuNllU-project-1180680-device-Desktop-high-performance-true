@@ -105,12 +105,12 @@ p { margin: 0 0 1em; }
 .promo-strip a { color: #ffd9a8; }
 
 .site-header { background: var(--white); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; }
-.header-main { display: flex; align-items: center; gap: 24px; height: var(--header-h); }
+.header-main { display: flex; align-items: center; gap: 16px; height: var(--header-h); }
 .logo { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.55rem; color: var(--green); letter-spacing: -.02em; text-decoration: none !important; }
 .logo svg { width: 38px; height: 30px; flex: none; }
 .main-nav { margin-left: auto; }
 .main-nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 4px; align-items: center; }
-.main-nav a { display: block; padding: 8px 12px; border-radius: 8px; color: var(--ink); font-weight: 500; font-size: .95rem; }
+.main-nav a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--ink); font-weight: 500; font-size: .94rem; white-space: nowrap; }
 .main-nav a:hover { background: var(--cream); text-decoration: none; }
 .main-nav a[aria-current="page"] { color: var(--orange); font-weight: 700; }
 .has-sub { position: relative; }
@@ -167,6 +167,7 @@ p { margin: 0 0 1em; }
 
 /* ---------- Cartes génériques ---------- */
 .grid { display: grid; gap: 20px; }
+.grid > *, .contact-grid > *, .cart-layout > *, .layout-sidebar > *, .shop-layout > *, .product-detail > *, .dash > * { min-width: 0; }
 .grid-2 { grid-template-columns: repeat(2, 1fr); }
 .grid-3 { grid-template-columns: repeat(3, 1fr); }
 .grid-4 { grid-template-columns: repeat(4, 1fr); }
@@ -189,7 +190,7 @@ p { margin: 0 0 1em; }
 .merchant-card h3 { margin-bottom: 4px; }
 .merchant-card .meta { color: var(--ink); font-size: .95rem; }
 .merchant-card .city { color: var(--muted); font-size: .92rem; }
-.pill { display: inline-block; font-size: .75rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--green-100); color: var(--green); }
+.pill { display: inline-block; white-space: nowrap; font-size: .75rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--green-100); color: var(--green); }
 .pill--orange { background: #fbe3cf; color: var(--brick); }
 .pill--grey { background: var(--beige); color: var(--muted); }
 .verified { color: var(--green); font-size: .8rem; font-weight: 700; }
@@ -345,6 +346,8 @@ p { margin: 0 0 1em; }
 .shop-hero h1 { color: #fff; margin-bottom: 4px; }
 .shop-hero p { margin-bottom: 14px; opacity: .95; }
 .shop-hero .hero-art { max-width: 380px; }
+.shop-hero .stars, .hero .stars { color: #ffe1a8; }
+.shop-hero .stars .off, .hero .stars .off { color: rgba(255,255,255,.35); }
 .shop-layout { display: grid; grid-template-columns: 280px 1fr; gap: 28px; align-items: start; }
 .side-menu { display: grid; gap: 8px; }
 .side-menu a, .side-menu button { display: flex; justify-content: space-between; align-items: center; background: var(--sand); padding: 12px 14px; border-radius: var(--radius-sm); color: var(--ink); font-weight: 600; border: 0; font: inherit; cursor: pointer; text-align: left; width: 100%; }
@@ -374,6 +377,7 @@ p { margin: 0 0 1em; }
 .supplier-tile svg { width: 64px; height: 64px; color: var(--green); }
 .supplier-tile span { font-weight: 400; font-size: .92rem; color: var(--muted); }
 .steps-list { counter-reset: s; display: grid; gap: 16px; grid-template-columns: repeat(4, 1fr); }
+.steps-list--3 { grid-template-columns: repeat(3, 1fr); }
 .steps-list li { list-style: none; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; position: relative; }
 .steps-list li::before { counter-increment: s; content: counter(s); width: 34px; height: 34px; border-radius: 50%; background: var(--orange); color: #fff; display: grid; place-items: center; font-weight: 800; margin-bottom: 10px; }
 .plan { padding: 26px; display: flex; flex-direction: column; gap: 10px; }
@@ -401,9 +405,17 @@ p { margin: 0 0 1em; }
 .kpi em { font-style: normal; font-size: .82rem; font-weight: 700; color: var(--success); }
 .chart { display: flex; align-items: flex-end; gap: 10px; height: 200px; padding: 16px 8px 0; border-bottom: 1px solid var(--line); }
 .chart .col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
-.chart .col i { display: block; width: 100%; max-width: 40px; background: var(--orange); border-radius: 6px 6px 0 0; }
-.chart .col:nth-child(even) i { background: var(--green); }
+.chart .col { position: relative; cursor: default; }
+.chart .col i { display: block; width: 100%; max-width: 36px; background: var(--green); border-radius: 4px 4px 0 0; transition: opacity .15s; }
+.chart:hover .col i { opacity: .55; }
+.chart .col:hover i, .chart .col:focus i { opacity: 1; }
 .chart .col small { font-size: .75rem; color: var(--muted); }
+.chart .col .tip { position: absolute; bottom: calc(100% - 18px); left: 50%; transform: translate(-50%, -100%); background: var(--ink); color: #fff; font-size: .78rem; padding: 4px 8px; border-radius: 6px; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .12s; z-index: 2; }
+.chart .col:hover .tip, .chart .col:focus .tip { opacity: 1; }
+.hbar { display: grid; grid-template-columns: minmax(120px, 1fr) 2fr 70px; gap: 10px; align-items: center; font-size: .9rem; padding: 4px 0; }
+.hbar .track { height: 10px; background: var(--beige); border-radius: 4px; overflow: hidden; }
+.hbar .fill { display: block; height: 100%; background: var(--green); border-radius: 0 4px 4px 0; }
+.hbar span:last-child { text-align: right; color: var(--muted); }
 .table-wrap { overflow-x: auto; }
 table.table { width: 100%; border-collapse: collapse; background: #fff; font-size: .93rem; }
 .table th, .table td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
@@ -443,7 +455,8 @@ table.table { width: 100%; border-collapse: collapse; background: #fff; font-siz
 .newsletter .container { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
 .newsletter h2 { color: #fff; margin: 0 0 4px; font-size: 1.4rem; }
 .newsletter p { margin: 0; opacity: .85; }
-.newsletter form { display: flex; gap: 8px; flex: 1; max-width: 460px; min-width: 260px; }
+.newsletter form { display: flex; gap: 8px; flex: 1 1 260px; max-width: 460px; min-width: 0; }
+.newsletter input { min-width: 0; }
 .newsletter input { flex: 1; border: 0; border-radius: 8px; padding: 12px 14px; font: inherit; }
 .site-footer { background: #142e23; color: #d7e2dc; padding: 48px 0 20px; font-size: .93rem; }
 .footer-grid { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 28px; }
@@ -490,17 +503,20 @@ table.table { width: 100%; border-collapse: collapse; background: #fff; font-siz
   .kpis { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1180px) {
   .burger { display: inline-flex; }
-  .main-nav { position: fixed; inset: var(--header-h) 0 0 0; background: #fff; margin: 0; padding: 16px; display: none; overflow-y: auto; }
+  .main-nav { position: absolute; top: var(--header-h); left: 0; right: 0; height: calc(100vh - var(--header-h)); background: #fff; margin: 0; padding: 16px; display: none; overflow-y: auto; z-index: 60; border-top: 1px solid var(--line); }
   .main-nav.is-open { display: block; }
   .main-nav ul { flex-direction: column; align-items: stretch; }
   .main-nav a { padding: 12px; font-size: 1.05rem; }
   .submenu { position: static; display: flex !important; box-shadow: none; border: 0; padding: 0 0 0 16px; min-width: 0; }
   .header-actions { margin-left: auto; }
+}
+
+@media (max-width: 900px) {
   .login-link { display: none; }
   .hero .container, .shop-hero .container { grid-template-columns: 1fr; padding-top: 36px; }
-  .hero-art { justify-self: center; max-width: 420px; }
+  .hero-art { justify-self: center; max-width: 320px; }
   .features ul { grid-template-columns: repeat(2, 1fr); }
   .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .layout-sidebar, .shop-layout, .cart-layout, .product-detail, .contact-grid { grid-template-columns: 1fr; }

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Marketplace — Commerçants, restaurants et artisans béninois | LocalBox</title>
+  <meta name="description" content="Achetez en ligne auprès de commerçants béninois : restaurants, épiceries, artisanat, cosmétique naturelle, coiffure et beauté.">
+  <meta name="theme-color" content="#cc6e28">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="marketplace">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <section class="hero hero--compact">
+      <div class="container">
+        <div>
+          <h1 id="mp-title">Service de marketplace</h1>
+          <p id="mp-sub">Achetez en ligne auprès de commerçants béninois.</p>
+          <a class="btn btn--light" href="vendre.html">Vous êtes commerçant ? Ouvrez votre boutique</a>
+        </div>
+        <div class="hero-art" style="max-width:380px"><img src="assets/img/hero-vendeuse.jpg" alt="" width="555" height="405"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="toolbar">
+          <label class="sr-only" for="cat">Catégorie</label>
+          <select class="select" id="cat"><option value="">Tous</option></select>
+          <div class="faq-cats" id="chips" style="margin:0"></div>
+          <span class="spacer"></span>
+          <label class="search-input" style="min-width:240px;background:#fff">
+            <span aria-hidden="true">🔎</span><span class="sr-only">Rechercher des commerçants</span>
+            <input type="search" id="q" placeholder="Rechercher des commerçants…">
+          </label>
+        </div>
+        <div class="toolbar">
+          <label class="sr-only" for="city">Ville</label>
+          <select class="select" id="city"><option value="">Toutes les villes</option></select>
+          <label class="check"><input type="checkbox" id="open-now"> Ouvert maintenant</label>
+          <label class="check"><input type="checkbox" id="delivery"> Livraison LocalBox</label>
+          <span class="spacer"></span>
+          <label class="sr-only" for="sort">Trier</label>
+          <select class="select" id="sort"><option value="rating">Mieux notés</option><option value="reviews">Plus d'avis</option><option value="az">Nom A → Z</option></select>
+        </div>
+        <p class="result-count" id="count"></p>
+        <div class="grid grid-4" id="grid"></div>
+      </div>
+    </section>
+
+    <section class="section section--sand">
+      <div class="container grid grid-3">
+        <div class="card card-body"><h3>⭐ Avis vérifiés</h3><p class="muted">Chaque boutique affiche sa note moyenne et les derniers commentaires des clients ayant réellement commandé.</p></div>
+        <div class="card card-body"><h3>🔐 Paiement sécurisé</h3><p class="muted">Vous payez via LocalBox (Mobile Money, carte ou à la livraison). Garantie LocalBox en cas de problème.</p></div>
+        <div class="card card-body"><h3>🏅 Badges de confiance</h3><p class="muted">« Top Vendeur » pour les mieux notés, « TokpaPro » pour les commerçants partenaires engagés depuis plus d'un an.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const { D, qs, esc, param, merchantCard, stars, openBadge, isOpen } = LB;
+      const state = { cat: param("cat") || "", q: "", city: "", open: false, delivery: false, sort: "rating" };
+
+      qs("#cat").innerHTML += D.shopCategories.map((c) => '<option value="' + c.id + '">' + c.emoji + " " + esc(c.name) + "</option>").join("");
+      qs("#chips").innerHTML = '<button class="chip" data-chip="restaurants">🍲 Restaurants</button>';
+      const cities = Array.from(new Set(D.shops.map((s) => s.city))).sort();
+      qs("#city").innerHTML += cities.map((c) => "<option>" + esc(c) + "</option>").join("");
+
+      function restoCard(s) {
+        return '<a class="card resto-card" href="boutique.html?id=' + s.id + '" style="color:inherit;text-decoration:none"><div class="resto-head"><h3>' + esc(s.name) + '</h3></div><div class="dishes">' +
+          s.products.slice(0, 3).map((p) => "<span>" + p.emoji + "</span>").join("") + '</div><div class="card-body">' +
+          "<p>Exemples : " + s.products.slice(0, 2).map((p) => esc(p.name)).join(", ") + "</p>" +
+          '<p class="muted">' + stars(s.rating) + " " + s.rating + " · " + esc(s.district) + ", " + esc(s.city) + "</p>" +
+          "<p>" + openBadge(s.hours) + ' <span class="muted">· Prêt en ' + esc(s.prep) + '</span></p><span class="link-arrow">Explorer →</span></div></a>';
+      }
+
+      function render() {
+        qs("#cat").value = state.cat;
+        qs("#chips .chip").classList.toggle("is-active", state.cat === "restaurants");
+        const cat = D.shopCategories.find((c) => c.id === state.cat);
+        qs("#mp-title").textContent = cat ? cat.name : "Service de marketplace";
+        qs("#mp-sub").textContent = cat && cat.id === "restaurants" ? "Retrouvez les meilleurs restaurants béninois." : "Achetez en ligne auprès de commerçants béninois.";
+
+        let list = D.shops.filter((s) =>
+          (!state.cat || s.cat === state.cat) &&
+          (!state.city || s.city === state.city) &&
+          (!state.open || isOpen(s.hours)) &&
+          (!state.delivery || s.logistics) &&
+          (!state.q || (s.name + " " + s.tagline + " " + s.products.map((p) => p.name).join(" ")).toLowerCase().includes(state.q.toLowerCase()))
+        );
+        if (state.sort === "rating") list.sort((a, b) => b.rating - a.rating);
+        if (state.sort === "reviews") list.sort((a, b) => b.reviews - a.reviews);
+        if (state.sort === "az") list.sort((a, b) => a.name.localeCompare(b.name, "fr"));
+
+        qs("#count").textContent = list.length + " boutique" + (list.length > 1 ? "s" : "");
+        const grid = qs("#grid");
+        grid.className = "grid " + (state.cat === "restaurants" ? "grid-3" : "grid-4");
+        grid.innerHTML = list.length
+          ? list.map(state.cat === "restaurants" ? restoCard : merchantCard).join("")
+          : '<div class="empty" style="grid-column:1/-1"><span class="emoji">🏪</span>Aucune boutique ne correspond à votre recherche.</div>';
+      }
+
+      qs("#cat").addEventListener("change", (e) => { state.cat = e.target.value; render(); });
+      qs("#chips").addEventListener("click", (e) => { if (e.target.closest("[data-chip]")) { state.cat = state.cat === "restaurants" ? "" : "restaurants"; render(); } });
+      qs("#q").addEventListener("input", (e) => { state.q = e.target.value; render(); });
+      qs("#city").addEventListener("change", (e) => { state.city = e.target.value; render(); });
+      qs("#open-now").addEventListener("change", (e) => { state.open = e.target.checked; render(); });
+      qs("#delivery").addEventListener("change", (e) => { state.delivery = e.target.checked; render(); });
+      qs("#sort").addEventListener("change", (e) => { state.sort = e.target.value; render(); });
+      render();
+    })();
+  </script>
+</body>
+</html>

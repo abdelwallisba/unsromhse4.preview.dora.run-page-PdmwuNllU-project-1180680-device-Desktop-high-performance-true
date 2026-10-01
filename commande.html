@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Suivi de commande | LocalBox</title>
+  <meta name="description" content="Suivez votre commande LocalBox en temps réel et confirmez la réception par QR code.">
+  <meta name="theme-color" content="#cc6e28">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="commande">
+  <div id="site-header"></div>
+
+  <main id="main">
+    <section class="section">
+      <div class="container" id="order-root"></div>
+    </section>
+  </main>
+
+  <!-- Modale générique -->
+  <div class="modal" id="modal" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <button class="icon-btn modal-close" id="modal-close" aria-label="Fermer">✕</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/vendor/qrcode.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const { C, qs, qsa, esc, fmt, param, orders, auth, STATUS, store, uid, toast } = LB;
+      const root = qs("#order-root");
+      const id = param("id");
+      const modal = qs("#modal");
+      const openModal = (html) => { qs("#modal-body").innerHTML = html; modal.classList.add("is-open"); };
+      const closeModal = () => modal.classList.remove("is-open");
+      qs("#modal-close").addEventListener("click", closeModal);
+      modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+
+      const PAY = { mtn: "MTN MoMo", moov: "Moov Money", celtiis: "Celtiis Cash", livraison: "Paiement à la livraison", carte: "Carte bancaire" };
+      const HANDOVER = { localbox: "Livré par LocalBox", retrait: "Retrait à la boutique", "mon-livreur": "Votre propre livreur", vendeur: "Livré par le vendeur" };
+
+      function render() {
+        const o = orders.get(id);
+        if (!o) {
+          root.innerHTML = '<div class="empty card"><span class="emoji">📦</span><h1>Commande introuvable</h1><p>Vérifiez le lien ou retrouvez vos commandes dans votre compte.</p><a class="btn btn--primary" href="compte.html#commandes">Mes commandes</a></div>';
+          return;
+        }
+        const status = orders.liveStatus(o);
+        const st = STATUS[status];
+        const canCancel = status === "confirmee" || status === "preparation";
+        const d = o.delivery;
+        const dateLabel = new Date(d.date + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+
+        root.innerHTML =
+          (param("new") ? '<div class="card card-body" style="background:var(--green-100);border-color:#bfd8c8;margin-bottom:20px"><h1 style="margin:0 0 6px;font-size:1.6rem">🎉 Merci ' + esc(o.customer.name.split(" ")[0]) + ", votre commande est confirmée !</h1><p style=\"margin:0\">Un récapitulatif vous sera envoyé sur WhatsApp. Vous avez gagné <strong>" + o.pointsEarned + " LocalPoints</strong>.</p></div>" : "") +
+          '<p class="breadcrumb"><a href="compte.html#commandes">Mes commandes</a> › ' + esc(o.id) + "</p>" +
+          '<div class="section-head"><div><h2 style="margin:0">Commande ' + esc(o.id) + '</h2><p class="muted" style="margin:0">Passée le ' + new Date(o.createdAt).toLocaleString("fr-FR") + '</p></div><span class="status ' + st.cls + '">' + st.label + "</span></div>" +
+
+          (status !== "annulee" ? '<div class="card card-body" style="margin-bottom:20px"><div class="track-steps">' +
+            ["Confirmée", "En préparation au mini-hub", "En cours de livraison", "Livrée"].map((l, i) => '<div class="' + (st.step >= i + 1 ? "done" : "") + '">' + l + "</div>").join("") +
+            "</div>" + (status === "en-route" ? '<p style="margin:18px 0 0;text-align:center">🛵 Votre livreur est en route. <strong>Préparez votre QR code</strong> pour confirmer la réception.</p>' : "") + "</div>" : "") +
+
+          '<div class="cart-layout"><div>' +
+          o.groups.map((g) => '<div class="card" style="margin-bottom:16px"><div class="card-body" style="border-bottom:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><strong>' + (g.shop ? "🏪 " + esc(g.shop.name) : "🛒 Magasin LocalBox") + '</strong><span class="muted">' + HANDOVER[g.handover] + (g.handover === "retrait" && g.shop ? " · " + esc(g.shop.district) + ", " + esc(g.shop.city) : "") + "</span></div>" +
+            g.lines.map((l) => '<div class="summary-row" style="padding:8px 18px"><span>' + esc(l.emoji || "") + " " + l.qty + " × " + esc(l.name) + ' <span class="muted">(' + esc(l.unit) + ")</span></span><strong>" + fmt(l.price * l.qty) + "</strong></div>").join("") + "</div>").join("") +
+
+          '<div class="card card-body"><h3>Facture</h3>' +
+          '<div class="summary-row"><span>Sous-total</span><span>' + fmt(o.subtotal) + "</span></div>" +
+          '<div class="summary-row"><span>Livraison</span><span>' + (o.deliveryFee ? fmt(o.deliveryFee) : "Offerte") + "</span></div>" +
+          (o.express ? '<div class="summary-row"><span>Express</span><span>' + fmt(o.express) + "</span></div>" : "") +
+          (o.discount ? '<div class="summary-row"><span>Remises</span><span>−' + fmt(o.discount) + "</span></div>" : "") +
+          '<div class="summary-row total"><span>Total</span><span>' + fmt(o.total) + "</span></div>" +
+          '<p class="muted" style="margin:8px 0 0">Paiement : ' + PAY[o.payment.method] + " · " + (o.payment.status === "payee" ? "✅ Payé" : o.payment.status === "rembourse" ? "↩️ Remboursé" : "💵 À régler à la livraison") + "</p>" +
+          '<button class="btn btn--ghost btn--sm" style="margin-top:12px" onclick="window.print()">🖨️ Imprimer la facture</button></div>' +
+          "</div><div>" +
+
+          (status !== "annulee" && status !== "livree" ? '<div class="card card-body" style="text-align:center;margin-bottom:16px"><h3>Votre QR code de réception</h3><div id="qr" style="display:grid;place-items:center;min-height:180px"></div><p class="muted" style="font-size:.88rem;margin:10px 0 0">À présenter au livreur <strong>après</strong> avoir vérifié votre panier. Ne le partagez pas : il prouve que c\'est bien vous.</p><p style="font-family:monospace;font-size:.85rem;margin:6px 0 0">' + esc(o.qr) + '</p><button class="btn btn--primary btn--sm" style="margin-top:12px" id="simulate-scan">Simuler le scan du livreur</button></div>' : "") +
+
+          '<div class="card card-body" style="margin-bottom:16px"><h3>Livraison</h3>' +
+          "<p style=\"margin:0 0 6px\">" + { Maison: "🏠", Travail: "💼", Autre: "📍" }[d.place] + " <strong>" + esc(d.place) + "</strong> · " + esc(d.district) + "</p>" +
+          '<p class="muted" style="margin:0 0 6px">' + esc(d.address) + "</p>" +
+          "<p style=\"margin:0 0 6px\">🗓️ " + dateLabel + ", " + esc(d.slot) + (d.express ? " · ⚡ Express" : "") + "</p>" +
+          (d.note ? '<p class="muted" style="margin:0">💬 « ' + esc(d.note) + " »</p>" : "") +
+          (canCancel || status === "en-route" ? '<div class="hero-ctas" style="margin-top:12px"><button class="btn btn--ghost btn--sm" id="reschedule">Reprogrammer</button><button class="btn btn--ghost btn--sm" id="message">Message au livreur</button></div>' : "") +
+          "</div>" +
+
+          '<div class="card card-body"><h3>Besoin d\'aide ?</h3>' +
+          (status === "livree" && !o.review ? '<button class="btn btn--orange btn--block" id="review">⭐ Noter ma commande (+' + C.points.review + " pts)</button>" : "") +
+          (o.review ? '<p>Votre note : ' + LB.stars(o.review.rating) + "</p>" : "") +
+          '<button class="btn btn--ghost btn--block" style="margin-top:8px" id="claim">Déclarer un problème</button>' +
+          (canCancel ? '<button class="btn btn--ghost btn--block" style="margin-top:8px;color:var(--danger)" id="cancel">Annuler la commande</button>' : "") +
+          '<a class="btn btn--whatsapp btn--block" style="margin-top:8px" target="_blank" rel="noopener" href="' + LB.waLink(null, "Bonjour LocalBox, j'ai une question sur ma commande " + o.id) + '">WhatsApp support</a>' +
+          (o.tickets && o.tickets.length ? '<p class="muted" style="font-size:.88rem;margin-top:12px">🎫 ' + o.tickets.length + " réclamation(s) en cours — réponse sous 48 h, au plus tard 7 jours ouvrés.</p>" : "") +
+          "</div></div></div>";
+
+        // QR code
+        const qrHost = qs("#qr");
+        if (qrHost) {
+          if (window.qrcode) {
+            const qr = qrcode(0, "M");
+            qr.addData("LOCALBOX|" + o.id + "|" + o.qr);
+            qr.make();
+            qrHost.innerHTML = qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true }).replace("<svg ", '<svg role="img" aria-label="QR code de réception" style="width:190px;height:190px" ');
+          } else qrHost.innerHTML = '<div style="font-size:4rem">🔳</div>';
+        }
+
+        bind(o, status);
+      }
+
+      function bind(o, status) {
+        const on = (sel, fn) => { const el = qs(sel); if (el) el.addEventListener("click", fn); };
+
+        on("#simulate-scan", () => {
+          orders.update(o.id, { status: "livree", deliveredAt: new Date().toISOString(), payment: Object.assign({}, o.payment, { status: o.payment.status === "a-la-livraison" ? "payee" : o.payment.status }) });
+          toast("✅ Réception confirmée par QR code. Merci !");
+          render();
+        });
+
+        on("#cancel", () => {
+          openModal('<h2>Annuler la commande ?</h2><p>L\'annulation est gratuite tant que le livreur n\'a pas pris en charge votre colis.' + (o.payment.status === "payee" ? " Vous serez remboursé par le même moyen de paiement (sous 24 h pour le Mobile Money)." : "") + '</p><div class="hero-ctas"><button class="btn btn--primary" id="confirm-cancel" style="background:var(--danger)">Oui, annuler</button><button class="btn btn--ghost" id="keep">Garder ma commande</button></div>');
+          qs("#keep").onclick = closeModal;
+          qs("#confirm-cancel").onclick = () => {
+            orders.update(o.id, { status: "annulee", payment: Object.assign({}, o.payment, { status: o.payment.status === "payee" ? "rembourse" : "annule" }) });
+            auth.addPoints(-o.pointsEarned, "Annulation " + o.id);
+            closeModal(); toast("Commande annulée."); render();
+          };
+        });
+
+        on("#reschedule", () => {
+          const today = new Date();
+          const opts = [0, 1, 2, 3].map((n) => { const d = new Date(today.getTime() + n * 864e5); return '<option value="' + d.toISOString().slice(0, 10) + '">' + d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }) + "</option>"; }).join("");
+          openModal('<h2>Reprogrammer la livraison</h2><form class="form" id="resched-form"><div class="field"><label for="r-date">Jour</label><select class="select" id="r-date">' + opts + '</select></div><div class="field"><label for="r-slot">Créneau</label><select class="select" id="r-slot">' + C.magasin.slots.map((s) => "<option>" + s + "</option>").join("") + '</select></div><label class="check"><input type="checkbox" id="r-relay"> Je préfère retirer ma commande au hub LocalBox de mon quartier</label><button class="btn btn--primary" type="submit">Enregistrer</button></form>');
+          qs("#resched-form").onsubmit = (e) => {
+            e.preventDefault();
+            const delivery = Object.assign({}, o.delivery, { date: qs("#r-date").value, slot: qs("#r-slot").value });
+            if (qs("#r-relay").checked) delivery.note = "Retrait au hub du quartier";
+            orders.update(o.id, { delivery });
+            closeModal(); toast("Livraison reprogrammée. Le livreur est prévenu."); render();
+          };
+        });
+
+        on("#message", () => {
+          openModal('<h2>Message au livreur</h2><form class="form" id="msg-form"><div class="faq-cats">' + ["Laisser le colis au gardien", "Appelez-moi en arrivant", "Je suis au 2e étage"].map((m) => '<button type="button" class="chip" data-m="' + m + '">' + m + "</button>").join("") + '</div><div class="field"><label for="m-text">Votre message</label><textarea class="textarea" id="m-text" style="min-height:80px">' + esc(o.delivery.note || "") + '</textarea></div><button class="btn btn--primary" type="submit">Envoyer</button></form>');
+          qs("#msg-form").addEventListener("click", (e) => { const c = e.target.closest("[data-m]"); if (c) qs("#m-text").value = c.dataset.m; });
+          qs("#msg-form").onsubmit = (e) => {
+            e.preventDefault();
+            orders.update(o.id, { delivery: Object.assign({}, o.delivery, { note: qs("#m-text").value.trim() }) });
+            closeModal(); toast("Message transmis au livreur."); render();
+          };
+        });
+
+        on("#review", () => {
+          openModal('<h2>Votre avis compte</h2><form class="form" id="rev-form"><fieldset style="border:0;padding:0"><legend>Note globale (produits et livraison)</legend><div class="faq-cats" id="rate">' + [1, 2, 3, 4, 5].map((n) => '<label class="chip"><input class="sr-only" type="radio" name="rate" value="' + n + '"' + (n === 5 ? " checked" : "") + ">" + "★".repeat(n) + "</label>").join("") + '</div></fieldset><div class="field"><label for="rev-text">Commentaire</label><textarea class="textarea" id="rev-text" placeholder="Fraîcheur des produits, ponctualité, amabilité du livreur…"></textarea></div><button class="btn btn--orange" type="submit">Publier mon avis</button></form>');
+          const sync = () => qsa("#rate label").forEach((l) => l.classList.toggle("is-active", l.querySelector("input").checked));
+          qs("#rate").addEventListener("change", sync); sync();
+          qs("#rev-form").onsubmit = (e) => {
+            e.preventDefault();
+            orders.update(o.id, { review: { rating: +qs('input[name="rate"]:checked').value, text: qs("#rev-text").value.trim(), date: new Date().toISOString() } });
+            auth.addPoints(C.points.review, "Avis " + o.id);
+            closeModal(); toast("Merci ! +" + C.points.review + " LocalPoints"); render();
+          };
+        });
+
+        on("#claim", () => {
+          const items = o.groups.flatMap((g) => g.lines).map((l) => "<option>" + esc(l.name) + "</option>").join("");
+          openModal('<h2>Déclarer un problème</h2><form class="form" id="claim-form">' +
+            '<div class="field"><label for="c-reason">Motif *</label><select class="select" id="c-reason" required><option value="">Choisir…</option><option>Article manquant</option><option>Produit reçu endommagé</option><option>Produit non conforme / erreur de préparation</option><option>Livraison jamais reçue</option><option>Retard de livraison</option><option>Problème de paiement</option><option>Autre</option></select></div>' +
+            '<div class="field"><label for="c-item">Article concerné</label><select class="select" id="c-item"><option>Toute la commande</option>' + items + "</select></div>" +
+            '<div class="field"><label for="c-desc">Décrivez le problème *</label><textarea class="textarea" id="c-desc" required></textarea></div>' +
+            '<div class="field"><label for="c-photo">Photo (facultatif)</label><input class="input" type="file" id="c-photo" accept="image/*"></div>' +
+            '<fieldset style="border:0;padding:0"><legend>Solution souhaitée</legend><label class="check"><input type="radio" name="sol" value="Renvoi du produit" checked> Renvoi du produit (livraison prioritaire gratuite)</label><label class="check"><input type="radio" name="sol" value="Remboursement"> Remboursement</label><label class="check"><input type="radio" name="sol" value="Avoir"> Avoir sur ma prochaine commande</label></fieldset>' +
+            '<div class="form-msg" id="c-msg"></div><button class="btn btn--primary" type="submit">Envoyer ma réclamation</button></form>');
+          qs("#claim-form").onsubmit = (e) => {
+            e.preventDefault();
+            if (!qs("#c-reason").value || !qs("#c-desc").value.trim()) { const m = qs("#c-msg"); m.className = "form-msg is-err"; m.textContent = "Merci d'indiquer le motif et de décrire le problème."; return; }
+            const ticket = { id: uid("T-"), order: o.id, reason: qs("#c-reason").value, item: qs("#c-item").value, desc: qs("#c-desc").value.trim(), solution: qs('input[name="sol"]:checked').value, photo: qs("#c-photo").files[0] ? qs("#c-photo").files[0].name : null, status: "Ouvert", createdAt: new Date().toISOString() };
+            store.set("tickets", [ticket].concat(store.get("tickets", [])));
+            orders.update(o.id, { tickets: (o.tickets || []).concat([ticket.id]) });
+            qs("#modal-body").innerHTML = '<h2>Réclamation enregistrée ✅</h2><p>Ticket <strong>' + ticket.id + "</strong>. Notre équipe SAV vous contacte sous 48 h (au plus tard 7 jours ouvrés). Vous n'aurez aucun frais si vous n'êtes pas responsable du problème.</p><button class=\"btn btn--primary\" id=\"ok\">Fermer</button>";
+            qs("#ok").onclick = () => { closeModal(); render(); };
+          };
+        });
+      }
+
+      render();
+      // Actualise l'avancement simulé
+      setInterval(() => { if (!modal.classList.contains("is-open")) render(); }, 30000);
+    })();
+  </script>
+</body>
+</html>

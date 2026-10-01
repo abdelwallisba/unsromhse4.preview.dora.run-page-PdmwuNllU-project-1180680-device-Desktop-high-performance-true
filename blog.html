@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blog — Le #CarnetDuMarché | LocalBox</title>
+  <meta name="description" content="Portraits de commerçants, nouveautés produits, conseils de consommation locale et journal de bord de LocalBox.">
+  <meta name="theme-color" content="#cc6e28">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="blog">
+  <div id="site-header"></div>
+  <main id="main">
+    <section class="page-banner"><div class="container"><h1>Le #CarnetDuMarché</h1><p>Portraits de commerçants, nouveautés, conseils de consommation locale et coulisses de LocalBox.</p></div></section>
+    <section class="section">
+      <div class="container">
+        <div class="faq-cats" id="cats"></div>
+        <div class="grid grid-3" id="posts"></div>
+      </div>
+    </section>
+    <section class="section section--sand">
+      <div class="container grid grid-3">
+        <div class="card card-body"><h3>🎬 Paroles du marché</h3><p class="muted">Mini-documentaires YouTube : des commerçantes de Dantokpa racontent leur histoire et leur savoir-faire.</p><a class="link-arrow" id="yt" href="#">Voir la chaîne →</a></div>
+        <div class="card card-body"><h3>🎧 Le podcast</h3><p class="muted">Tous les 15 jours, en français et en langues locales : histoires inspirantes d'artisans, d'agriculteurs et de cuisinières.</p><span class="pill pill--grey">Bientôt</span></div>
+        <div class="card card-body"><h3>📅 Événements</h3><p class="muted">Pop-up « Food &amp; Box », ateliers cuisine et artisanat, Journées du Commerce Digital : LocalBox vient dans votre quartier chaque mois.</p><a class="link-arrow" href="contact.html?sujet=evenement">Nous inviter →</a></div>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const { D, C, qs, esc } = LB;
+      qs("#yt").href = C.social.youtube;
+      const cats = ["Tous"].concat(Array.from(new Set(D.posts.map((p) => p.cat))));
+      let active = "Tous";
+      function render() {
+        qs("#cats").innerHTML = cats.map((c) => '<button class="chip' + (c === active ? " is-active" : "") + '" data-c="' + esc(c) + '">' + esc(c) + "</button>").join("");
+        qs("#posts").innerHTML = D.posts.filter((p) => active === "Tous" || p.cat === active).map((p) =>
+          '<a class="card post-card" href="article.html?id=' + p.id + '"><div class="post-cover" style="background:' + p.color + '">' + p.emoji + '</div><div class="card-body"><span class="post-meta">' + esc(p.cat) + " · " + new Date(p.date).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) + " · " + p.read + "</span><h3>" + esc(p.title) + "</h3><p>" + esc(p.excerpt) + '</p><span class="link-arrow" style="margin-top:auto">Lire →</span></div></a>'
+        ).join("");
+      }
+      qs("#cats").addEventListener("click", (e) => { const b = e.target.closest("[data-c]"); if (b) { active = b.dataset.c; render(); } });
+      render();
+    })();
+  </script>
+</body>
+</html>

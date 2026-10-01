@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Article | Blog LocalBox</title>
+  <meta name="description" content="Article du blog LocalBox.">
+  <meta name="theme-color" content="#cc6e28">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="blog">
+  <div id="site-header"></div>
+  <main id="main">
+    <section class="section"><div class="container"><article class="article" id="article"></article></div></section>
+    <section class="section section--white"><div class="container"><div class="section-head"><h2>À lire aussi</h2></div><div class="grid grid-3" id="more"></div></div></section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const { D, qs, esc, param, waLink } = LB;
+      const p = D.posts.find((x) => x.id === param("id"));
+      if (!p) {
+        qs("#article").innerHTML = '<div class="empty"><span class="emoji">📰</span><h1>Article introuvable</h1><a class="btn btn--primary" href="blog.html">Retour au blog</a></div>';
+        return;
+      }
+      document.title = p.title + " | Blog LocalBox";
+      qs("#article").innerHTML = '<p class="breadcrumb"><a href="blog.html">Blog</a> › ' + esc(p.cat) + "</p><h1>" + esc(p.title) + '</h1><p class="muted">' + new Date(p.date).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) + " · " + p.read + " de lecture</p>" +
+        '<div class="post-cover" style="background:' + p.color + '">' + p.emoji + "</div>" +
+        p.body.map((b) => (b.startsWith("## ") ? "<h2>" + esc(b.slice(3)) + "</h2>" : "<p>" + esc(b) + "</p>")).join("") +
+        '<div class="hero-ctas" style="margin-top:28px"><a class="btn btn--whatsapp" target="_blank" rel="noopener" href="' + waLink("", p.title + " — " + location.href) + '">Partager sur WhatsApp</a><a class="btn btn--ghost" href="blog.html">← Tous les articles</a></div>';
+      qs("#more").innerHTML = D.posts.filter((x) => x.id !== p.id).slice(0, 3).map((x) =>
+        '<a class="card post-card" href="article.html?id=' + x.id + '"><div class="post-cover" style="background:' + x.color + '">' + x.emoji + '</div><div class="card-body"><span class="post-meta">' + esc(x.cat) + "</span><h3>" + esc(x.title) + "</h3></div></a>").join("");
+    })();
+  </script>
+</body>
+</html>

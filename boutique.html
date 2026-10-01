@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Boutique | LocalBox Marketplace</title>
+  <meta name="description" content="Mini-boutique LocalBox : produits, horaires, avis clients et contact du commerçant.">
+  <meta name="theme-color" content="#cc6e28">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="marketplace">
+  <div id="site-header"></div>
+  <main id="main"><div id="shop-root"></div></main>
+  <div id="site-footer"></div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    (function () {
+      const { D, C, qs, qsa, esc, fmt, param, stars, openBadge, shopProductCard, waLink, store, auth, toast } = LB;
+      const s = D.shops.find((x) => x.id === param("id"));
+      const root = qs("#shop-root");
+
+      if (!s) {
+        root.innerHTML = '<section class="section"><div class="container empty card"><span class="emoji">🏪</span><h1>Boutique introuvable</h1><a class="btn btn--primary" href="marketplace.html">Voir toutes les boutiques</a></div></section>';
+        return;
+      }
+      document.title = s.name + " — " + s.tagline + " | LocalBox";
+      const cat = D.shopCategories.find((c) => c.id === s.cat);
+      const dayNames = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+      const days = [1, 2, 3, 4, 5, 6, 0].filter((d) => s.hours.days.includes(d)).map((d) => dayNames[d]).join(", ");
+
+      // Avis : avis de démonstration + avis laissés sur cet appareil
+      const localReviews = store.get("shopReviews", {})[s.id] || [];
+      const allReviews = localReviews.concat(D.reviews);
+      const dist = [5, 4, 3, 2, 1].map((n) => ({ n, pct: n === 5 ? 68 : n === 4 ? 22 : n === 3 ? 6 : n === 2 ? 3 : 1 }));
+
+      root.innerHTML =
+        '<section class="shop-hero"><div class="container"><div>' +
+        '<p class="breadcrumb" style="color:#ffe1c2"><a href="marketplace.html" style="color:#ffe1c2">Marketplace</a> › <a href="marketplace.html?cat=' + s.cat + '" style="color:#ffe1c2">' + esc(cat.name) + "</a></p>" +
+        "<h1>" + esc(s.name) + "</h1><p>" + esc(s.tagline) + "</p>" +
+        '<p style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">' + openBadge(s.hours) + s.badges.map((b) => '<span class="pill pill--orange">🏅 ' + esc(b) + "</span>").join("") + '<span style="opacity:.95">' + stars(s.rating) + " " + s.rating + " (" + s.reviews + " avis)</span></p>" +
+        '<div class="hero-ctas"><a class="btn btn--brick" href="#produits">' + (s.booking ? "Réserver une prestation" : "Commander maintenant") + '</a><a class="btn btn--whatsapp" target="_blank" rel="noopener" href="' + waLink(s.whatsapp, "Bonjour " + s.name + ", je vous contacte via LocalBox.") + '">WhatsApp</a></div>' +
+        '</div><div class="hero-art">' + (s.img ? '<img src="' + esc(s.img) + '" alt="" style="max-height:220px;width:auto;margin:auto">' : '<div style="font-size:7rem;text-align:center">' + s.emoji + "</div>") + "</div></div></section>" +
+
+        '<section class="section"><div class="container shop-layout">' +
+        "<aside><h2 style=\"font-size:1.4rem\">À propos</h2>" +
+        '<nav class="side-menu" aria-label="Sections de la boutique"><a href="#produits">Produits <span>›</span></a><a href="#avis">Avis clients <span>›</span></a><a href="#infos">Horaires &amp; contact <span>›</span></a></nav>' +
+        '<div class="card card-body" style="margin-top:16px" id="infos"><p style="margin-top:0">' + esc(s.about) + "</p>" +
+        '<ul class="spec-list" style="margin:0">' +
+        "<li>📍 " + esc(s.district) + ", " + esc(s.city) + "</li>" +
+        "<li>🕒 " + days + " · " + s.hours.open.replace(":", "h") + " – " + s.hours.close.replace(":", "h") + "</li>" +
+        "<li>⏱️ Préparation : " + esc(s.prep) + "</li>" +
+        "<li>" + (s.logistics ? "🛵 Livraison assurée par LocalBox" : "🏬 Retrait boutique ou votre propre livreur") + "</li>" +
+        "<li>📆 Sur LocalBox depuis " + esc(s.since) + "</li></ul></div>" +
+        '<a class="btn btn--ghost btn--block" style="margin-top:12px" href="tel:' + C.contact.phone.replace(/\s/g, "") + '">📞 Appeler le support</a>' +
+        "</aside>" +
+
+        "<div>" +
+        '<div id="produits"><div class="section-head"><h2 style="margin:0">' + (s.booking ? "Prestations" : "Produits") + '</h2><span class="muted">' + s.products.length + " article(s)</span></div>" +
+        '<div class="grid grid-3 grid--products">' + s.products.map((p) => shopProductCard(s, p)).join("") + "</div></div>" +
+
+        '<div id="avis" style="margin-top:48px"><h2>Avis et notations</h2>' +
+        '<div class="card rating-summary"><div class="rating-big"><div class="num">' + String(s.rating).replace(".", ",") + "</div>" + stars(s.rating) + '<div class="muted">' + s.reviews + " avis</div></div>" +
+        '<div class="bars">' + dist.map((d) => '<div class="bar"><span>' + d.n + '★</span><span class="track"><span class="fill" style="width:' + d.pct + '%;display:block"></span></span><span>' + d.pct + "%</span></div>").join("") + "</div></div>" +
+        '<div class="card" style="margin-top:16px">' + allReviews.map((r) => '<div class="review"><div class="review-head"><div class="person"><span class="avatar">' + esc(r.initials) + "</span><span><strong>" + esc(r.name) + "</strong><span>" + esc(r.date) + "</span></span></div>" + stars(r.rating) + "</div><p style=\"margin:0\">" + esc(r.text) + "</p></div>").join("") + "</div>" +
+        '<form class="card card-body form" id="review-form" style="margin-top:16px"><h3>Laisser un avis</h3>' +
+        '<div class="form-row"><div class="field"><label for="r-name">Votre prénom</label><input class="input" id="r-name" required value="' + esc((auth.user() || {}).name || "") + '"></div>' +
+        '<div class="field"><label for="r-rate">Note</label><select class="select" id="r-rate"><option value="5">★★★★★ Excellent</option><option value="4">★★★★ Très bien</option><option value="3">★★★ Correct</option><option value="2">★★ Décevant</option><option value="1">★ Mauvais</option></select></div></div>' +
+        '<div class="field"><label for="r-text">Commentaire</label><textarea class="textarea" id="r-text" required></textarea></div>' +
+        '<button class="btn btn--primary" type="submit">Publier (+' + C.points.review + " LocalPoints)</button></form>" +
+        "</div></div></div></section>";
+
+      qs("#review-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = qs("#r-name").value.trim(), text = qs("#r-text").value.trim();
+        if (!name || !text) return;
+        const all = store.get("shopReviews", {});
+        all[s.id] = [{ name, initials: name.slice(0, 2).toUpperCase(), rating: +qs("#r-rate").value, date: "À l'instant", text }].concat(all[s.id] || []);
+        store.set("shopReviews", all);
+        auth.addPoints(C.points.review, "Avis boutique " + s.name);
+        toast("Merci pour votre avis !");
+        setTimeout(() => location.reload(), 800);
+      });
+    })();
+  </script>
+</body>
+</html>
